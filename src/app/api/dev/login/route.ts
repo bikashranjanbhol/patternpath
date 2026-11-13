@@ -4,15 +4,16 @@ import { isLocalMode } from "@/lib/config";
 import { accountStore } from "@/lib/data/store";
 import { createDevSessionToken, SESSION_COOKIE, sessionCookieOptions } from "@/lib/session";
 
-const Body = z.object({ premium: z.boolean().optional() });
+const Body = z.object({ premium: z.boolean().optional(), admin: z.boolean().optional() });
 
 /**
  * Local mode only: signs in a fake "Dev Learner" so the app can be tried
- * without a Firebase project. Pass { premium: true } to start with Premium.
+ * without a Firebase project. Pass { premium: true } to start with Premium,
+ * { admin: true } to open the authoring tool.
  */
 export async function POST(request: Request) {
   if (!isLocalMode()) return new Response("Not found", { status: 404 });
-  const { premium } = Body.parse(await request.json().catch(() => ({})));
+  const { premium, admin } = Body.parse(await request.json().catch(() => ({})));
 
   const uid = "dev-learner";
   await (await accountStore()).ensureUser({ uid, name: "Dev Learner", email: "dev@example.com", photoUrl: null });
@@ -20,7 +21,13 @@ export async function POST(request: Request) {
 
   (await cookies()).set(
     SESSION_COOKIE,
-    createDevSessionToken({ uid, name: "Dev Learner", email: "dev@example.com", premiumUntil }),
+    createDevSessionToken({
+      uid,
+      name: admin ? "Dev Admin" : "Dev Learner",
+      email: "dev@example.com",
+      premiumUntil,
+      role: admin ? "admin" : "user",
+    }),
     sessionCookieOptions,
   );
   return Response.json({ ok: true });

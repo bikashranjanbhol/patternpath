@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 !.env.example
+
+# Pyodide runtime, copied from node_modules before dev/build
+/public/pyodide/

@@ -45,7 +45,13 @@ export async function POST(request: Request) {
       Math.max(viewer.premiumUntil ?? 0, result.user.plan.premiumUntil ?? 0) || null;
     (await cookies()).set(
       SESSION_COOKIE,
-      createDevSessionToken({ uid: viewer.uid, name: viewer.name, email: viewer.email, premiumUntil }),
+      createDevSessionToken({
+        uid: viewer.uid,
+        name: viewer.name,
+        email: viewer.email,
+        premiumUntil,
+        role: viewer.role,
+      }),
       sessionCookieOptions,
     );
   }

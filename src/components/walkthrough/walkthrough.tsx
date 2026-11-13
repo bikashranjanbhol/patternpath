@@ -86,22 +86,28 @@ export function Walkthrough({ problemId, approaches, concepts, signedIn, isPremi
           </div>
         </section>
 
-        <section className="flex flex-col gap-3 rounded-2xl bg-surface-2 px-5 py-4">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-[0.08em] text-coral">Bottleneck</span>
-            <p className="text-sm leading-relaxed text-body">{approach.bottleneck}</p>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-[0.08em] text-lime">Key insight</span>
-            {approach.insight ? (
-              <p className="text-sm leading-relaxed text-body">{approach.insight}</p>
-            ) : (
-              <Link href={unlockHref} className="flex items-center gap-2 text-sm text-amber">
-                <LockIcon size={14} /> Unlock with Premium
-              </Link>
+        {(approach.bottleneck || approach.insight !== "") && (
+          <section className="flex flex-col gap-3 rounded-2xl bg-surface-2 px-5 py-4">
+            {approach.bottleneck && (
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold uppercase tracking-[0.08em] text-coral">Bottleneck</span>
+                <p className="text-sm leading-relaxed text-body">{approach.bottleneck}</p>
+              </div>
             )}
-          </div>
-        </section>
+            {approach.insight !== "" && (
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold uppercase tracking-[0.08em] text-lime">Key insight</span>
+                {approach.insight ? (
+                  <p className="text-sm leading-relaxed text-body">{approach.insight}</p>
+                ) : (
+                  <Link href={unlockHref} className="flex items-center gap-2 text-sm text-amber">
+                    <LockIcon size={14} /> Unlock with Premium
+                  </Link>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
         {concepts.length > 0 && (
           <section className="flex flex-col rounded-2xl border border-line bg-surface px-5 py-4">
@@ -182,10 +188,12 @@ export function Walkthrough({ problemId, approaches, concepts, signedIn, isPremi
             <span className="font-mono text-xl">{approach.space}</span>
           </div>
         </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface px-4 py-3.5">
-          <span className="text-[13px] font-semibold">Why it is {approach.time}</span>
-          <p className="text-sm leading-relaxed text-muted">{approach.complexityWhy}</p>
-        </div>
+        {approach.complexityWhy && (
+          <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface px-4 py-3.5">
+            <span className="text-[13px] font-semibold">Why it is {approach.time}</span>
+            <p className="text-sm leading-relaxed text-muted">{approach.complexityWhy}</p>
+          </div>
+        )}
       </section>
     </div>
   );

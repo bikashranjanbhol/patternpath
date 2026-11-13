@@ -10,7 +10,10 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "seed": "tsx scripts/seed.ts",
-    "emulators": "firebase emulators:start"
+    "emulators": "firebase emulators:start",
+    "predev": "node scripts/copy-pyodide.mjs",
+    "prebuild": "node scripts/copy-pyodide.mjs",
+    "make-admin": "tsx scripts/make-admin.ts"
   },
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.7",
@@ -20,6 +23,7 @@
     "firebase": "^13.3.0",
     "firebase-admin": "^14.5.1",
     "next": "16.4.6",
+    "pyodide": "^314.0.7",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",

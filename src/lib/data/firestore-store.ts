@@ -12,13 +12,15 @@ import type {
   UserRecord,
 } from "@/lib/types";
 import { applyFulfillment, FulfillError } from "./fulfill";
-import type {
-  AccountStore,
-  ContentStore,
-  FulfillResult,
-  NewOrder,
-  NewUser,
-  PaymentInfo,
+import {
+  summarize,
+  type AccountStore,
+  type ContentAdmin,
+  type ContentStore,
+  type FulfillResult,
+  type NewOrder,
+  type NewUser,
+  type PaymentInfo,
 } from "./store";
 
 // Firestore implementation. Collection and field names follow the
@@ -39,7 +41,7 @@ function stripTimes<T extends Record<string, unknown>>(data: T): T {
   return out as T;
 }
 
-export class FirestoreContentStore implements ContentStore {
+export class FirestoreContentStore implements ContentStore, ContentAdmin {
   async listPatterns() {
     const snap = await db()
       .collection("patterns")
@@ -102,6 +104,59 @@ export class FirestoreContentStore implements ContentStore {
     return snap.docs
       .map((d) => withId<Plan>(d.id, d.data())!)
       .sort((a, b) => a.order - b.order);
+  }
+
+  // -- admin --
+  async listAllProblems() {
+    const snap = await db().collection("problems").orderBy("number", "desc").get();
+    return snap.docs.map((d) => withId<Problem>(d.id, stripTimes(d.data()))!);
+  }
+
+  async getProblemAny(id: string) {
+    const d = await db().collection("problems").doc(id).get();
+    return withId<Problem>(d.id, d.exists ? stripTimes(d.data()!) : undefined);
+  }
+
+  async listConcepts() {
+    const snap = await db().collection("concepts").select("title").get();
+    return snap.docs.map((d) => ({ id: d.id, title: (d.get("title") as string) ?? d.id }));
+  }
+
+  /** Keeps patterns/{id}.problemCount equal to its published problems. */
+  private async recount(patternIds: string[]) {
+    for (const pid of new Set(patternIds.filter(Boolean))) {
+      const agg = await db()
+        .collection("problems")
+        .where("primaryPatternId", "==", pid)
+        .where("published", "==", true)
+        .count()
+        .get();
+      await db().collection("patterns").doc(pid).set({ problemCount: agg.data().count }, { merge: true });
+    }
+  }
+
+  async saveProblem(problem: Problem) {
+    const ref = db().collection("problems").doc(problem.id);
+    const before = await ref.get();
+    const solutions = await this.listSolutions(problem.id);
+    const { id: _id, ...data } = problem;
+    void _id;
+    await ref.set({ ...data, solutionSummaries: summarize(solutions), updatedAt: Timestamp.now() });
+    await this.recount([problem.primaryPatternId, (before.get("primaryPatternId") as string) ?? ""]);
+  }
+
+  async saveSolution(solution: Solution) {
+    const problemRef = db().collection("problems").doc(solution.problemId);
+    const { id, problemId: _p, ...data } = solution;
+    void _p;
+    await problemRef.collection("solutions").doc(id).set({ ...data, updatedAt: Timestamp.now() });
+    await problemRef.update({ solutionSummaries: summarize(await this.listSolutions(solution.problemId)) });
+  }
+
+  async deleteSolution(problemId: string, solutionId: string) {
+    const problemRef = db().collection("problems").doc(problemId);
+    await problemRef.collection("solutions").doc(solutionId).delete();
+    await problemRef.update({ solutionSummaries: summarize(await this.listSolutions(problemId)) });
   }
 }
 

@@ -115,8 +115,8 @@ export function DryRunPlayer({ approach, stepIndex, onStep, conceptTitles }: Pro
           {step.check ? (
             <div className="flex flex-col gap-2.5 rounded-xl border border-line p-3.5 font-mono text-[13px]">
               <span className="rounded-lg bg-surface-2 px-2.5 py-2">{step.check.left}</span>
-              <span className="text-center text-dim">{step.check.op}</span>
-              <span className="rounded-lg bg-surface-2 px-2.5 py-2">{step.check.right}</span>
+              {step.check.op && <span className="text-center text-dim">{step.check.op}</span>}
+              {step.check.right && <span className="rounded-lg bg-surface-2 px-2.5 py-2">{step.check.right}</span>}
               <span
                 className={`self-start rounded-full px-3 py-1 font-semibold ${step.check.result ? "bg-lime text-bg" : "bg-coral/15 text-coral"}`}
               >

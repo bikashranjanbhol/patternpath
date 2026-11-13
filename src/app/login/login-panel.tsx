@@ -29,19 +29,19 @@ export function LoginPanel({ localMode }: { localMode: boolean }) {
     }
   }
 
-  async function dev(premium: boolean) {
+  async function dev(premium: boolean, admin = false) {
     setState("waiting");
     const res = await fetch("/api/dev/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ premium }),
+      body: JSON.stringify({ premium, admin }),
     });
     if (!res.ok) {
       setError("Dev sign-in failed.");
       setState("error");
       return;
     }
-    router.replace(next);
+    router.replace(admin ? "/admin" : next);
     router.refresh();
   }
 
@@ -73,6 +73,9 @@ export function LoginPanel({ localMode }: { localMode: boolean }) {
           </button>
           <button type="button" onClick={() => dev(true)} className="min-h-14 rounded-2xl border border-amber/50 font-semibold text-amber">
             Dev sign-in (Premium)
+          </button>
+          <button type="button" onClick={() => dev(true, true)} className="min-h-12 rounded-2xl border border-violet/50 text-sm font-semibold text-violet-ink">
+            Dev sign-in (Admin, opens the authoring tool)
           </button>
         </div>
       ) : (

@@ -28,6 +28,7 @@ interface DevPayload {
   name: string;
   email: string;
   premiumUntil: number | null;
+  role?: "user" | "admin";
   exp: number;
 }
 
@@ -94,7 +95,7 @@ export async function getViewer(opts: { checkRevoked?: boolean } = {}): Promise<
       name: p.name,
       email: p.email,
       photoUrl: null,
-      role: "user",
+      role: p.role === "admin" ? "admin" : "user",
       premiumUntil: p.premiumUntil,
     };
   }
@@ -131,4 +132,10 @@ export async function hasPremium(viewer: Viewer | null, now = Date.now()): Promi
 /** Premium according to the session alone (no database read). */
 export function viewerHasActiveClaim(viewer: Viewer, now = Date.now()) {
   return isPremiumActive(viewer.premiumUntil, now);
+}
+
+/** The viewer if they are an admin, otherwise null. */
+export async function getAdmin(): Promise<Viewer | null> {
+  const viewer = await getViewer({ checkRevoked: true });
+  return viewer?.role === "admin" ? viewer : null;
 }

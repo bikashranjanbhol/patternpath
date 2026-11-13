@@ -45,6 +45,21 @@ export interface ContentStore {
   listPlans(): Promise<Plan[]>;
 }
 
+/** Content editing for admins. Reads here are never cached. */
+export interface ContentAdmin {
+  /** Every problem, published or not, newest number first. */
+  listAllProblems(): Promise<Problem[]>;
+  getProblemAny(id: string): Promise<Problem | null>;
+  listConcepts(): Promise<Pick<Concept, "id" | "title">[]>;
+  saveProblem(problem: Problem): Promise<void>;
+  /** Saves a solution and refreshes the problem's solution summaries. */
+  saveSolution(solution: Solution): Promise<void>;
+  deleteSolution(problemId: string, solutionId: string): Promise<void>;
+}
+
+/** Thrown when content can't be saved here (e.g. demo mode on a read-only host). */
+export class ContentReadOnlyError extends Error {}
+
 /** Per-user and payment data. Never cached. */
 export interface AccountStore {
   getUser(uid: string): Promise<UserRecord | null>;
@@ -62,10 +77,10 @@ export interface AccountStore {
   recordPaymentEvent(key: string, data: Record<string, unknown>): Promise<boolean>;
 }
 
-let content: ContentStore | undefined;
+let content: (ContentStore & ContentAdmin) | undefined;
 let accounts: AccountStore | undefined;
 
-export async function contentStore(): Promise<ContentStore> {
+export async function contentStore(): Promise<ContentStore & ContentAdmin> {
   if (!content) {
     content =
       config.dataSource === "firestore"
@@ -83,4 +98,23 @@ export async function accountStore(): Promise<AccountStore> {
         : new (await import("./local-store")).LocalAccountStore();
   }
   return accounts;
+}
+
+export async function contentAdmin(): Promise<ContentAdmin> {
+  return contentStore();
+}
+
+/** Solution summaries kept on the problem document (no code, safe to show). */
+export function summarize(solutions: Solution[]): Problem["solutionSummaries"] {
+  return [...solutions]
+    .sort((a, b) => a.order - b.order)
+    .map((s) => ({
+      solutionId: s.id,
+      name: s.name,
+      kind: s.kind,
+      tier: s.tier,
+      time: s.time,
+      space: s.space,
+      stepCount: s.steps.length,
+    }));
 }

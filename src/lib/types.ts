@@ -86,6 +86,26 @@ export interface Step {
   done: boolean;
 }
 
+/** How a solution's dry run was recorded, so it can be re-recorded later. */
+export interface RecordingConfig {
+  /** Python lines that set up the example input, e.g. s1 = "ab". */
+  setup: string;
+  /** The call to trace, e.g. checkInclusion(s1, s2). */
+  call: string;
+  /** Variable drawn as cells (a string or list from the setup). */
+  trackVar: string | null;
+  /** Window as two index variables… */
+  leftVar: string | null;
+  rightVar: string | null;
+  /** …or as a start index plus a fixed size (a variable name or a number). */
+  indexVar: string | null;
+  sizeVar: string | null;
+  /** Variables never shown in the variables table. */
+  hiddenVars: string[];
+  /** Drop lines that change nothing and test nothing. */
+  skipQuiet: boolean;
+}
+
 export interface Solution {
   id: string;
   problemId: string;
@@ -106,6 +126,7 @@ export interface Solution {
   pointerStyle: "LR" | "i" | "none";
   steps: Step[];
   version: number;
+  authoring?: RecordingConfig;
 }
 
 export interface ConceptSection {

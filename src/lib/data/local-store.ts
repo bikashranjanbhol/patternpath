@@ -1,15 +1,20 @@
 import "server-only";
+import fs from "node:fs";
+import path from "node:path";
 import * as seed from "@/content/seed";
 import { readJson, signJson } from "@/lib/dev-token";
-import type { Order, UserRecord } from "@/lib/types";
+import type { Order, Problem, Solution, UserRecord } from "@/lib/types";
 import { applyFulfillment, FulfillError } from "./fulfill";
-import type {
-  AccountStore,
-  ContentStore,
-  FulfillResult,
-  NewOrder,
-  NewUser,
-  PaymentInfo,
+import {
+  ContentReadOnlyError,
+  summarize,
+  type AccountStore,
+  type ContentAdmin,
+  type ContentStore,
+  type FulfillResult,
+  type NewOrder,
+  type NewUser,
+  type PaymentInfo,
 } from "./store";
 
 // Development/demo store: content comes from src/content/seed.ts. Users and
@@ -19,27 +24,76 @@ import type {
 
 const clone = <T>(x: T): T => structuredClone(x);
 
-export class LocalContentStore implements ContentStore {
+// ---- Content: seed + files written by the authoring tool --------------------
+
+const AUTHORED_DIR = path.join(process.cwd(), "content", "authored");
+
+interface AuthoredFile {
+  problem: Problem;
+  solutions: Solution[];
+}
+
+function readAuthored(): AuthoredFile[] {
+  if (!fs.existsSync(AUTHORED_DIR)) return [];
+  return fs
+    .readdirSync(AUTHORED_DIR)
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => JSON.parse(fs.readFileSync(path.join(AUTHORED_DIR, f), "utf8")) as AuthoredFile);
+}
+
+/** Seed content with authored files layered on top (same ID = authored wins). */
+function allContent() {
+  const problems = new Map(seed.problems.map((p) => [p.id, p]));
+  const solutions = new Map<string, Solution[]>();
+  for (const s of seed.solutions) solutions.set(s.problemId, [...(solutions.get(s.problemId) ?? []), s]);
+  for (const a of readAuthored()) {
+    problems.set(a.problem.id, a.problem);
+    solutions.set(a.problem.id, a.solutions);
+  }
+  return { problems: [...problems.values()], solutions };
+}
+
+function writeAuthored(file: AuthoredFile) {
+  if (process.env.VERCEL) {
+    throw new ContentReadOnlyError(
+      "This deployment can't save files. Run the app locally (npm run dev) to author content, or connect Firebase.",
+    );
+  }
+  fs.mkdirSync(AUTHORED_DIR, { recursive: true });
+  fs.writeFileSync(
+    path.join(AUTHORED_DIR, `${file.problem.id}.json`),
+    JSON.stringify(file, null, 2) + "\n",
+  );
+}
+
+export class LocalContentStore implements ContentStore, ContentAdmin {
   async listPatterns() {
-    return clone(seed.patterns.filter((p) => p.published).sort((a, b) => a.order - b.order));
+    const { problems } = allContent();
+    return clone(
+      seed.patterns
+        .filter((p) => p.published)
+        .sort((a, b) => a.order - b.order)
+        .map((p) => ({
+          ...p,
+          problemCount: problems.filter((q) => q.published && q.primaryPatternId === p.id).length,
+        })),
+    );
   }
   async getPattern(id: string) {
-    return clone(seed.patterns.find((p) => p.id === id && p.published) ?? null);
+    return (await this.listPatterns()).find((p) => p.id === id) ?? null;
   }
   async listProblemsByPattern(patternId: string) {
     return clone(
-      seed.problems
-        .filter((p) => p.published && p.primaryPatternId === patternId)
+      allContent()
+        .problems.filter((p) => p.published && p.primaryPatternId === patternId)
         .sort((a, b) => a.ladderOrder - b.ladderOrder),
     );
   }
   async getProblem(id: string) {
-    return clone(seed.problems.find((p) => p.id === id && p.published) ?? null);
+    return clone(allContent().problems.find((p) => p.id === id && p.published) ?? null);
   }
   async listSolutions(problemId: string) {
-    return clone(
-      seed.solutions.filter((s) => s.problemId === problemId).sort((a, b) => a.order - b.order),
-    );
+    return clone([...(allContent().solutions.get(problemId) ?? [])].sort((a, b) => a.order - b.order));
   }
   async getConcept(id: string) {
     return clone(seed.concepts.find((c) => c.id === id && c.published) ?? null);
@@ -48,10 +102,40 @@ export class LocalContentStore implements ContentStore {
     return seed.concepts.filter((c) => c.published).map((c) => c.id);
   }
   async listProblemIds() {
-    return seed.problems.filter((p) => p.published).map((p) => p.id);
+    return allContent().problems.filter((p) => p.published).map((p) => p.id);
   }
   async listPlans() {
     return clone(seed.plans.filter((p) => p.active).sort((a, b) => a.order - b.order));
+  }
+
+  // -- admin --
+  async listAllProblems() {
+    return clone(allContent().problems.sort((a, b) => b.number - a.number));
+  }
+  async getProblemAny(id: string) {
+    return clone(allContent().problems.find((p) => p.id === id) ?? null);
+  }
+  async listConcepts() {
+    return seed.concepts.map((c) => ({ id: c.id, title: c.title }));
+  }
+  async saveProblem(problem: Problem) {
+    const solutions = await this.listSolutions(problem.id);
+    writeAuthored({ problem: { ...problem, solutionSummaries: summarize(solutions) }, solutions });
+  }
+  async saveSolution(solution: Solution) {
+    const problem = await this.getProblemAny(solution.problemId);
+    if (!problem) throw new Error("Problem not found");
+    const solutions = [
+      ...(await this.listSolutions(problem.id)).filter((s) => s.id !== solution.id),
+      solution,
+    ].sort((a, b) => a.order - b.order);
+    writeAuthored({ problem: { ...problem, solutionSummaries: summarize(solutions) }, solutions });
+  }
+  async deleteSolution(problemId: string, solutionId: string) {
+    const problem = await this.getProblemAny(problemId);
+    if (!problem) return;
+    const solutions = (await this.listSolutions(problemId)).filter((s) => s.id !== solutionId);
+    writeAuthored({ problem: { ...problem, solutionSummaries: summarize(solutions) }, solutions });
   }
 }
 
