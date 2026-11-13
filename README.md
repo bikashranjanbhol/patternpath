@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PatternPath
 
-## Getting Started
+LeetCode problems grouped by pattern, with step-by-step dry runs from brute force to optimal.
+Brute-force solutions are free; optimized solutions are Premium.
 
-First, run the development server:
+Stack (see the High-Level Design doc): **Next.js 16** on **Firebase App Hosting**, **Firebase Auth
+(Google only)**, **Cloud Firestore**, **Cashfree** for payments.
+
+## Run it in 1 minute (no Firebase needed)
 
 ```bash
+npm install
+cp .env.example .env.local   # defaults: DATA_SOURCE=local, PAYMENT_GATEWAY=mock
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. On **Sign in**, use *Dev sign-in (Free)* or *Dev sign-in (Premium)*.
+Checkout goes to a test "pay" screen where you can succeed or fail a payment.
+In local mode, content comes from `src/content/seed.ts` and accounts live in memory.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run against Firebase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Firebase project, enable **Authentication → Google**, create a **Firestore** database,
+   and upgrade to the **Blaze** plan (App Hosting needs it; you pay only above the free limits).
+2. Add a web app in the console and copy its config into the `NEXT_PUBLIC_FIREBASE_*` variables.
+3. Set `DATA_SOURCE=firestore` and either use the emulators:
 
-## Learn More
+   ```bash
+   npx firebase-tools emulators:start          # auth :9099, firestore :8080, UI :4000
+   FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_PROJECT_ID=demo-patternpath npm run seed
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+   or a real project with `FIREBASE_SERVICE_ACCOUNT_JSON` (never commit it) and `npm run seed`.
+4. Deploy rules and indexes: `npx firebase-tools deploy --only firestore`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Payments (Cashfree)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create a Cashfree merchant account and get **sandbox** keys.
+2. Set `PAYMENT_GATEWAY=cashfree`, `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`.
+3. Webhook URL: `https://<your-domain>/api/payments/webhook`. Premium is unlocked only by the
+   signed webhook or by the server asking Cashfree for the order status, never by the browser.
+4. Plans are one-time payments for 1, 3 or 12 months (no auto-debit at launch).
 
-## Deploy on Vercel
+The mock gateway refuses to run unless `DATA_SOURCE=local` (or `ALLOW_MOCK_PAYMENTS=true` on a
+staging project), so it can never hand out free Premium in production.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy (Firebase App Hosting)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Connect the GitHub repo in **Firebase console → App Hosting**. Settings are in `apphosting.yaml`
+(fill in the `REPLACE` values; store Cashfree keys as secrets:
+`firebase apphosting:secrets:set CASHFREE_CLIENT_SECRET`). `minInstances: 0` keeps idle cost at zero.
+Set a budget alert in Google Cloud Billing.
+
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Local development |
+| `npm run build` | Production build |
+| `npm test` | Unit tests (pricing, Premium periods, access boundary, webhook signatures) |
+| `npm run typecheck` | TypeScript |
+| `npm run lint` | ESLint |
+| `npm run seed` | Write seed content to Firestore |
+
+## Where things live
+
+| Path | What |
+| --- | --- |
+| `src/app/problems/[problemId]` | Solution walkthrough: approaches, dry-run player, paywall |
+| `src/lib/walkthrough.ts` | **The Premium boundary**: what the browser may see per approach |
+| `src/lib/session.ts` | Session cookie, current user, Premium check |
+| `src/lib/content.ts` | Cached content reads (`"use cache"`, refreshed hourly) |
+| `src/lib/data/` | Data stores: Firestore and local (in-memory) |
+| `src/lib/payments/` | Gateway interface, Cashfree adapter, webhook parsing, fulfilment |
+| `src/content/seed.ts` | Seed content: 16 patterns, 2 problems with dry runs, 4 concept articles |
+| `firestore.rules`, `firestore.indexes.json` | From the Database Design doc |
+
+## Not built yet
+
+Admin panel for content, dashboard progress and streaks, review drills, discussion comments,
+Java/C++/JS solution code, renewal reminder emails, and auto-renewing plans.
