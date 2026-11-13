@@ -1,7 +1,7 @@
 import "server-only";
-import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { config, isLocalMode } from "@/lib/config";
+import { readJson, signJson } from "@/lib/dev-token";
 import { accountStore } from "@/lib/data/store";
 import { isPremiumActive } from "@/lib/pricing";
 import type { Viewer } from "@/lib/types";
@@ -19,32 +19,24 @@ export const sessionCookieOptions = {
 };
 
 // ---- Dev sessions (DATA_SOURCE=local only) --------------------------------
+// The whole session, including the Premium end date, lives in a signed cookie
+// so the demo works on serverless hosts without a database.
 
 interface DevPayload {
   uid: string;
   name: string;
   email: string;
+  premiumUntil: number | null;
   exp: number;
 }
 
-function sign(data: string) {
-  return createHmac("sha256", config.devSessionSecret).update(data).digest("base64url");
-}
-
 export function createDevSessionToken(p: Omit<DevPayload, "exp">) {
-  const payload: DevPayload = { ...p, exp: Date.now() + SESSION_MAX_AGE_S * 1000 };
-  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  return `${body}.${sign(body)}`;
+  return signJson({ ...p, exp: Date.now() + SESSION_MAX_AGE_S * 1000 } satisfies DevPayload);
 }
 
 function readDevSessionToken(token: string): DevPayload | null {
-  const [body, sig] = token.split(".");
-  if (!body || !sig) return null;
-  const expected = Buffer.from(sign(body));
-  const given = Buffer.from(sig);
-  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
-  const payload = JSON.parse(Buffer.from(body, "base64url").toString()) as DevPayload;
-  return payload.exp > Date.now() ? payload : null;
+  const payload = readJson<DevPayload>(token);
+  return payload && payload.exp > Date.now() ? payload : null;
 }
 
 // ---- Firebase sessions -----------------------------------------------------
@@ -93,15 +85,13 @@ export async function getViewer(opts: { checkRevoked?: boolean } = {}): Promise<
   if (isLocalMode()) {
     const p = readDevSessionToken(token);
     if (!p) return null;
-    const user = await (await accountStore()).getUser(p.uid);
-    if (!user) return null;
     return {
       uid: p.uid,
       name: p.name,
       email: p.email,
       photoUrl: null,
-      role: user.role,
-      premiumUntil: user.plan.premiumUntil,
+      role: "user",
+      premiumUntil: p.premiumUntil,
     };
   }
 
@@ -129,6 +119,7 @@ export async function getViewer(opts: { checkRevoked?: boolean } = {}): Promise<
 export async function hasPremium(viewer: Viewer | null, now = Date.now()): Promise<boolean> {
   if (!viewer) return false;
   if (isPremiumActive(viewer.premiumUntil, now)) return true;
+  if (isLocalMode()) return false; // the dev cookie is the source of truth
   const user = await (await accountStore()).getUser(viewer.uid);
   return isPremiumActive(user?.plan.premiumUntil ?? null, now);
 }

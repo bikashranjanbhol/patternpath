@@ -15,16 +15,12 @@ export async function POST(request: Request) {
   const { premium } = Body.parse(await request.json().catch(() => ({})));
 
   const uid = "dev-learner";
-  const store = await accountStore();
-  await store.ensureUser({ uid, name: "Dev Learner", email: "dev@example.com", photoUrl: null });
-  const { LocalAccountStore } = await import("@/lib/data/local-store");
-  if (store instanceof LocalAccountStore) {
-    await store.setPremiumUntil(uid, premium ? Date.now() + 30 * 24 * 3600 * 1000 : null);
-  }
+  await (await accountStore()).ensureUser({ uid, name: "Dev Learner", email: "dev@example.com", photoUrl: null });
+  const premiumUntil = premium ? Date.now() + 30 * 24 * 3600 * 1000 : null;
 
   (await cookies()).set(
     SESSION_COOKIE,
-    createDevSessionToken({ uid, name: "Dev Learner", email: "dev@example.com" }),
+    createDevSessionToken({ uid, name: "Dev Learner", email: "dev@example.com", premiumUntil }),
     sessionCookieOptions,
   );
   return Response.json({ ok: true });

@@ -51,6 +51,22 @@ Connect the GitHub repo in **Firebase console → App Hosting**. Settings are in
 `firebase apphosting:secrets:set CASHFREE_CLIENT_SECRET`). `minInstances: 0` keeps idle cost at zero.
 Set a budget alert in Google Cloud Billing.
 
+## Deploy a demo on Vercel
+
+The app runs on Vercel in demo mode with no database: the session (including Premium) lives in a
+signed cookie and test orders are signed snapshots, so nothing depends on server memory.
+Set these environment variables in the Vercel project:
+
+| Variable | Value |
+| --- | --- |
+| `DATA_SOURCE` | `local` |
+| `PAYMENT_GATEWAY` | `mock` |
+| `DEV_SESSION_SECRET` | a long random string (marked Sensitive) |
+
+Anyone with the link can use *Dev sign-in (Premium)*, so treat it as a demo, not the product.
+For real users, switch to `DATA_SOURCE=firestore` and `PAYMENT_GATEWAY=cashfree` (see above).
+Vercel's Hobby plan is for non-commercial use; move to Pro (or Firebase App Hosting) before charging.
+
 ## Scripts
 
 | Command | What it does |

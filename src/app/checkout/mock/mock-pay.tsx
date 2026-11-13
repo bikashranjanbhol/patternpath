@@ -7,19 +7,30 @@ export function MockPay() {
   const router = useRouter();
   const params = useSearchParams();
   const orderId = params.get("order_id") ?? "";
-  const back = params.get("return");
-  const returnPath =
-    back && back.startsWith("/checkout/result?") ? back : `/checkout/result?order_id=${encodeURIComponent(orderId)}`;
+  const back = params.get("return") ?? "";
+  // Keep the "next" path from the gateway return URL.
+  const next = back.startsWith("/checkout/result?")
+    ? new URLSearchParams(back.split("?")[1]).get("next")
+    : null;
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   async function finish(outcome: "success" | "failure") {
     setBusy(true);
-    await fetch("/api/payments/mock", {
+    const res = await fetch("/api/payments/mock", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ orderId, outcome }),
     });
-    router.push(returnPath);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setBusy(false);
+      setError("This test order has expired. Start checkout again.");
+      return;
+    }
+    const q = new URLSearchParams({ order_id: data.orderId });
+    if (next) q.set("next", next);
+    router.push(`/checkout/result?${q}`);
   }
 
   return (
@@ -32,6 +43,7 @@ export function MockPay() {
       <button type="button" disabled={busy} onClick={() => finish("success")} className="min-h-12 rounded-xl bg-lime font-semibold text-bg">
         Pay successfully
       </button>
+      {error && <p role="alert" className="text-sm text-coral">{error}</p>}
       <button type="button" disabled={busy} onClick={() => finish("failure")} className="min-h-12 rounded-xl border border-coral/60 font-semibold text-coral">
         Fail the payment
       </button>

@@ -1,5 +1,6 @@
 import "server-only";
 import * as seed from "@/content/seed";
+import { readJson, signJson } from "@/lib/dev-token";
 import type { Order, UserRecord } from "@/lib/types";
 import { applyFulfillment, FulfillError } from "./fulfill";
 import type {
@@ -11,8 +12,10 @@ import type {
   PaymentInfo,
 } from "./store";
 
-// Development-only store: content comes from src/content/seed.ts and accounts
-// live in memory (lost on restart). Kept on globalThis so hot reload keeps it.
+// Development/demo store: content comes from src/content/seed.ts. Users and
+// orders are cached in memory, but each order is also a signed snapshot in its
+// own ID ("lo_…"), so the demo checkout works on serverless hosts where memory
+// is not shared. Paying produces a new snapshot ID with status "paid".
 
 const clone = <T>(x: T): T => structuredClone(x);
 
@@ -58,7 +61,6 @@ interface Memory {
   events: Set<string>;
   couponUses: Map<string, number>;
   redemptions: Set<string>;
-  seq: number;
 }
 
 const g = globalThis as unknown as { __ppMemory?: Memory };
@@ -68,7 +70,6 @@ const mem: Memory = (g.__ppMemory ??= {
   events: new Set(),
   couponUses: new Map(),
   redemptions: new Set(),
-  seq: 0,
 });
 
 export class LocalAccountStore implements AccountStore {
@@ -89,17 +90,6 @@ export class LocalAccountStore implements AccountStore {
     return clone(user);
   }
 
-  /** Dev helper: give or remove Premium without paying. */
-  async setPremiumUntil(uid: string, premiumUntil: number | null) {
-    const user = mem.users.get(uid);
-    if (!user) return;
-    user.plan = {
-      ...user.plan,
-      tier: premiumUntil ? "premium" : "free",
-      premiumUntil,
-    };
-  }
-
   async getPlan(id: string) {
     return clone(seed.plans.find((p) => p.id === id && p.active) ?? null);
   }
@@ -114,15 +104,25 @@ export class LocalAccountStore implements AccountStore {
     return mem.redemptions.has(`${code.toUpperCase()}:${uid}`);
   }
 
-  async createOrder(o: NewOrder) {
-    mem.seq += 1;
-    const order: Order = { ...o, id: `local_${Date.now()}_${mem.seq}` };
+  /** Stores an order snapshot and returns it with its new signed ID. */
+  snapshot(o: NewOrder | Order): Order {
+    const { id: _old, ...data } = o as Order;
+    void _old;
+    const order: Order = { ...data, id: `lo_${signJson(data)}` };
     mem.orders.set(order.id, order);
     return clone(order);
   }
 
+  async createOrder(o: NewOrder) {
+    return this.snapshot(o);
+  }
+
   async getOrder(id: string) {
-    return clone(mem.orders.get(id) ?? null);
+    const cached = mem.orders.get(id);
+    if (cached) return clone(cached);
+    if (!id.startsWith("lo_")) return null;
+    const data = readJson<NewOrder>(id.slice(3));
+    return data ? { ...data, id } : null;
   }
 
   async setGatewayOrderId(id: string, gatewayOrderId: string) {
@@ -131,19 +131,21 @@ export class LocalAccountStore implements AccountStore {
   }
 
   async markOrderFailed(id: string) {
-    const o = mem.orders.get(id);
-    if (o && o.status === "created") o.status = "failed";
+    const o = await this.getOrder(id);
+    if (o && o.status === "created") mem.orders.set(id, this.snapshot({ ...o, status: "failed" }));
   }
 
   async fulfillOrder(orderId: string, payment: PaymentInfo, now: number): Promise<FulfillResult> {
-    const order = mem.orders.get(orderId);
+    const order = await this.getOrder(orderId);
     if (!order) throw new FulfillError("Order not found");
-    const user = mem.users.get(order.uid);
-    if (!user) throw new FulfillError("User not found");
+    const user =
+      mem.users.get(order.uid) ??
+      (await this.ensureUser({ uid: order.uid, name: "Dev Learner", email: "", photoUrl: null }));
     const plan = seed.plans.find((p) => p.id === order.planId);
     if (!plan) throw new FulfillError("Plan not found");
     const result = applyFulfillment(order, user, plan, payment, now);
     if (result.changed) {
+      result.order = this.snapshot(result.order);
       mem.orders.set(orderId, result.order);
       mem.users.set(user.uid, result.user);
       if (order.couponCode) {

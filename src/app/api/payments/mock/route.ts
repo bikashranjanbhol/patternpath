@@ -1,12 +1,17 @@
+import { cookies } from "next/headers";
 import { z } from "zod";
-import { config, mockPaymentsAllowed } from "@/lib/config";
+import { config, isLocalMode, mockPaymentsAllowed } from "@/lib/config";
 import { accountStore } from "@/lib/data/store";
 import { fulfillPaidOrder } from "@/lib/payments/fulfillment";
-import { getViewer } from "@/lib/session";
+import { createDevSessionToken, getViewer, SESSION_COOKIE, sessionCookieOptions } from "@/lib/session";
 
 const Body = z.object({ orderId: z.string(), outcome: z.enum(["success", "failure"]) });
 
-/** Mock gateway only: simulate a successful or failed payment. */
+/**
+ * Mock gateway only: simulate a successful or failed payment.
+ * Returns the order's ID afterwards, which changes in local mode because
+ * local orders are signed snapshots.
+ */
 export async function POST(request: Request) {
   if (config.paymentGateway !== "mock" || !mockPaymentsAllowed()) {
     return new Response("Not found", { status: 404 });
@@ -23,8 +28,26 @@ export async function POST(request: Request) {
 
   if (parsed.data.outcome === "failure") {
     await store.markOrderFailed(order.id);
-  } else {
-    await fulfillPaidOrder(order.id, { gatewayPaymentId: `mock_${order.id}`, method: "upi" });
+    const { LocalAccountStore } = await import("@/lib/data/local-store");
+    const id =
+      store instanceof LocalAccountStore ? store.snapshot({ ...order, status: "failed" }).id : order.id;
+    return Response.json({ ok: true, orderId: id });
   }
-  return Response.json({ ok: true });
+
+  const result = await fulfillPaidOrder(order.id, {
+    gatewayPaymentId: `mock_${Date.now()}`,
+    method: "upi",
+  });
+
+  if (isLocalMode()) {
+    // The demo session carries Premium itself, so extend it in the cookie.
+    const premiumUntil =
+      Math.max(viewer.premiumUntil ?? 0, result.user.plan.premiumUntil ?? 0) || null;
+    (await cookies()).set(
+      SESSION_COOKIE,
+      createDevSessionToken({ uid: viewer.uid, name: viewer.name, email: viewer.email, premiumUntil }),
+      sessionCookieOptions,
+    );
+  }
+  return Response.json({ ok: true, orderId: result.order.id });
 }
