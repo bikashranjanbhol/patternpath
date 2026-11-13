@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { config, isLocalMode } from "@/lib/config";
 import { readJson, signJson } from "@/lib/dev-token";
 import { accountStore } from "@/lib/data/store";
@@ -79,6 +80,9 @@ export async function createFirebaseSession(idToken: string, currentSessionCooki
  * deciding to lock something.
  */
 export async function getViewer(opts: { checkRevoked?: boolean } = {}): Promise<Viewer | null> {
+  // Session checks compare expiry times with the clock, so they must run per
+  // request, never during prerendering (including runtime prefetches).
+  await connection();
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
