@@ -42,6 +42,7 @@ const StepSchema = z.object({
     .nullable(),
   conceptId: slug.nullable(),
   done: z.boolean(),
+  marks: z.array(z.object({ at: z.number().int().min(0), label: z.string().min(1).max(12) })).max(4).optional(),
 });
 
 export const RecordingSchema = z.object({
@@ -55,6 +56,7 @@ export const RecordingSchema = z.object({
   hiddenVars: z.array(z.string()),
   skipQuiet: z.boolean(),
   pointerMode: z.enum(["window", "pair"]).optional(),
+  markVars: z.array(z.string().min(1).max(12)).max(4).optional(),
 });
 
 export const SolutionSchema = z.object({

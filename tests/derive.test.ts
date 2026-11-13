@@ -153,3 +153,25 @@ describe("binary search shapes", () => {
     expect([reset.inIndex, reset.outIndex]).toEqual([null, null]);
   });
 });
+
+describe("extra markers", () => {
+  it("marks each listed index variable on its own cell", () => {
+    const trace: TraceResult = {
+      events: [{ line: 2, depth: 1, locals: { i: "0", left: "1", right: "3" } }],
+      trackItems: ["a", "b", "c", "d"],
+      returnValue: "None",
+      error: null,
+      truncated: false,
+      stdout: "",
+    };
+    const [s] = deriveSteps("def f():\n    i, left, right = 0, 1, 3", trace, {
+      ...DEFAULT_RECORDING,
+      leftVar: "left",
+      rightVar: "right",
+      pointerMode: "pair",
+      markVars: ["i", "missing"],
+    });
+    expect(s.window).toEqual([1, 3]);
+    expect(s.marks).toEqual([{ at: 0, label: "i" }]);
+  });
+});

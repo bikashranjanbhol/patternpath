@@ -170,6 +170,9 @@ export function deriveSteps(code: string, trace: TraceResult, cfg: RecordingConf
     }
 
     const window = windowOf(ev.locals, cfg, length);
+    const marks = (cfg.markVars ?? [])
+      .map((name) => ({ at: asInt(ev.locals[name]), label: name }))
+      .filter((m): m is { at: number; label: string } => m.at !== null && m.at >= 0 && (length === 0 || m.at < length));
     const left = cfg.leftVar ? asInt(ev.locals[cfg.leftVar]) : null;
     const right = cfg.rightVar ? asInt(ev.locals[cfg.rightVar]) : null;
     const { inIndex, outIndex } = movement(cfg, left, right, prevLeft, prevRight);
@@ -185,7 +188,12 @@ export function deriveSteps(code: string, trace: TraceResult, cfg: RecordingConf
       !check &&
       ev.returned === undefined &&
       !windowMoved &&
-      !ASSIGN_RE.test(text.trim());
+      !ASSIGN_RE.test(text.trim()) &&
+      // A call statement like seen.add(x) did something even if nothing visibly changed.
+      !/^[A-Za-z_][\w.]*\(.*\)$/.test(text.trim()) &&
+      // A loop line that starts an iteration, and the first line that runs, are worth a step.
+      !(/^for\s/.test(text.trim()) && next !== undefined && next.line > ev.line && next.line <= blockEnd(lines, ev.line)) &&
+      k !== 0;
     prev = ev.locals;
     prevWindowRaw = window;
     if (left !== null) prevLeft = left;
@@ -202,6 +210,7 @@ export function deriveSteps(code: string, trace: TraceResult, cfg: RecordingConf
       check,
       conceptId: null,
       done: false,
+      ...(marks.length ? { marks } : {}),
     });
   });
 

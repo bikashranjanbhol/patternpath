@@ -84,6 +84,8 @@ export interface Step {
   check: StepCheck | null;
   conceptId: string | null;
   done: boolean;
+  /** Extra single-cell markers (see RecordingConfig.markVars). */
+  marks?: { at: number; label: string }[];
 }
 
 /** How a solution's dry run was recorded, so it can be re-recorded later. */
@@ -110,6 +112,8 @@ export interface RecordingConfig {
    * Missing means "window".
    */
   pointerMode?: "window" | "pair";
+  /** More index variables to mark on their own cell, e.g. ["i"] next to left/right. */
+  markVars?: string[];
 }
 
 export interface Solution {

@@ -330,6 +330,15 @@ export function Studio({ problem, existing, others, concepts }: Props) {
               </select>
             </Field>
           )}
+          <Field label="Also mark these index variables" hint="Comma separated, e.g. i">
+            <input
+              spellCheck={false}
+              className={`${inputCls} font-mono text-sm`}
+              placeholder="i"
+              value={(cfg.markVars ?? []).join(", ")}
+              onChange={(e) => rebuild({ ...cfg, markVars: e.target.value.split(",").map((x) => x.trim()).filter(Boolean).slice(0, 4) })}
+            />
+          </Field>
           <label className="flex items-center gap-2 text-sm text-muted">
             <input
               type="checkbox"

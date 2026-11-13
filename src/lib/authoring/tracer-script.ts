@@ -65,8 +65,9 @@ def run_trace(code, setup, call, track_var, max_events):
     try:
         exec(compile(code, "<solution>", "exec"), env)
         exec(compile(setup, "<setup>", "exec"), env)
-        if track_var and track_var in env:
-            result["trackItems"] = _items(env[track_var])
+        # Fallback only: the drawn variable is normally taken from the solution
+        # itself, after its first line ran (so an in-place sort shows sorted).
+        fallback_items = _items(env[track_var]) if track_var and track_var in env else None
 
         pending = {"ev": None, "frame": None}
 
@@ -74,8 +75,8 @@ def run_trace(code, setup, call, track_var, max_events):
             if pending["ev"] is not None:
                 frame = pending["frame"]
                 pending["ev"]["locals"] = _snapshot(frame)
-                # The drawn variable can also be made inside the solution
-                # (e.g. a sorted copy): take its first value there.
+                # Take the drawn variable from the solution after its first line ran;
+                # it can also be made inside the solution (e.g. a sorted copy).
                 if (result["trackItems"] is None and track_var
                         and pending["ev"]["depth"] == 1 and track_var in frame.f_locals):
                     result["trackItems"] = _items(frame.f_locals[track_var])
@@ -114,6 +115,8 @@ def run_trace(code, setup, call, track_var, max_events):
             sys.settrace(None)
             close_pending()
         result["returnValue"] = _short(value)
+        if result["trackItems"] is None:
+            result["trackItems"] = fallback_items
     except _TooLong:
         result["truncated"] = True
     except Exception as e:

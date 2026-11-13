@@ -216,12 +216,13 @@ function Track({ approach, step }: { approach: ApproachView; step: Step }) {
   const cellFont = longest <= 2 ? "text-lg sm:text-[22px]" : longest <= 4 ? "text-base sm:text-lg" : "text-xs sm:text-sm";
   const pair = approach.pointerStyle === "pair";
   const [nameL, nameR] = approach.pointerNames ?? ["L", "R"];
-  const pointer = (k: number) => {
+  const marksAt = (k: number) => (step.marks ?? []).filter((m) => m.at === k).map((m) => m.label);
+  function pointer(k: number) {
     if (!win) return "";
     if (approach.pointerStyle === "LR" || pair) return [k === win[0] ? nameL : "", k === win[1] ? nameR : ""].filter(Boolean).join(" ");
     if (approach.pointerStyle === "i") return k === win[0] ? "i" : "";
     return k === win[0] ? "match" : "";
-  };
+  }
   return (
     <div className="flex flex-col gap-2" aria-label={`${approach.track.label} with the current ${pair ? "pointers" : "window"} highlighted`}>
       <span className="font-mono text-xs text-dim">{approach.track.label}</span>
@@ -241,6 +242,7 @@ function Track({ approach, step }: { approach: ApproachView; step: Step }) {
           else if (step.inIndex === k) cls = "border-2 border-teal bg-teal/15 text-ink";
           else if (step.outIndex === k) cls = "border-2 border-dashed border-coral bg-coral/10 text-coral";
           else if (inWin) cls = "border-2 border-lime bg-lime/10 text-ink";
+          else if (marksAt(k).length) cls = "border-2 border-violet bg-violet/10 text-ink";
           return (
             <div key={k} className={`flex h-14 items-center justify-center rounded-xl font-mono ${cellFont} ${cls}`}>
               {ch === " " ? <span aria-label="space" className="opacity-60">␣</span> : ch}
@@ -252,7 +254,12 @@ function Track({ approach, step }: { approach: ApproachView; step: Step }) {
         {items.map((_, k) => <span key={k}>{k}</span>)}
       </div>
       <div className="grid h-[18px] gap-2.5 text-center font-mono text-[13px] font-semibold text-lime" style={cols}>
-        {items.map((_, k) => <span key={k}>{pointer(k)}</span>)}
+        {items.map((_, k) => (
+          <span key={k}>
+            {pointer(k)}
+            {marksAt(k).length > 0 && <span className="text-violet-ink">{pointer(k) ? " " : ""}{marksAt(k).join(" ")}</span>}
+          </span>
+        ))}
       </div>
     </div>
   );

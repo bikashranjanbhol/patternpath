@@ -1,0 +1,6274 @@
+{
+  "problem": {
+    "id": "15-3sum",
+    "number": 15,
+    "title": "3Sum",
+    "difficulty": "Medium",
+    "primaryPatternId": "two-pointers",
+    "patternIds": [
+      "two-pointers",
+      "hashing"
+    ],
+    "ladderOrder": 4,
+    "description": "Given a list of integers nums, find every group of three numbers at three different positions that adds up to 0. Return the groups as lists of values. Each group of values may appear only once in the answer, even if it can be built from different positions. The order of the groups, and of the values inside a group, doesn't matter.",
+    "examples": [
+      {
+        "input": "nums = [-1, 2, -1, 0, 1]",
+        "output": "[[-1, -1, 2], [-1, 0, 1]]",
+        "note": "[-1, 0, 1] can use either -1, but it is listed once."
+      },
+      {
+        "input": "nums = [1, 2, 3]",
+        "output": "[]",
+        "note": "No three numbers add up to 0."
+      },
+      {
+        "input": "nums = [0, 0, 0, 0]",
+        "output": "[[0, 0, 0]]"
+      }
+    ],
+    "constraints": [
+      "3 ≤ nums.length ≤ 3000",
+      "-10⁵ ≤ nums[i] ≤ 10⁵"
+    ],
+    "sourceUrl": "https://leetcode.com/problems/3sum/",
+    "conceptIds": [
+      "two-pointers",
+      "hash-map"
+    ],
+    "companyTags": [
+      "Meta",
+      "Amazon",
+      "Google",
+      "Microsoft",
+      "Bloomberg"
+    ],
+    "published": true,
+    "solutionSummaries": [
+      {
+        "solutionId": "brute-force",
+        "name": "Check every triplet",
+        "kind": "brute",
+        "tier": "free",
+        "time": "O(n³)",
+        "space": "O(k)",
+        "stepCount": 41
+      },
+      {
+        "solutionId": "hash-set",
+        "name": "Fix one, two-sum with a set",
+        "kind": "better",
+        "tier": "premium",
+        "time": "O(n²)",
+        "space": "O(n)",
+        "stepCount": 55
+      },
+      {
+        "solutionId": "sort-two-pointers",
+        "name": "Sort, fix one, two pointers",
+        "kind": "optimal",
+        "tier": "premium",
+        "time": "O(n²)",
+        "space": "O(1)",
+        "stepCount": 34
+      }
+    ]
+  },
+  "solutions": [
+    {
+      "id": "brute-force",
+      "problemId": "15-3sum",
+      "order": 1,
+      "name": "Check every triplet",
+      "kind": "brute",
+      "tier": "free",
+      "time": "O(n³)",
+      "space": "O(k)",
+      "complexityWhy": "Three nested loops try every group of three positions: about n³/6 groups. The set holds the k distinct answers.",
+      "bottleneck": "For each pair (i, j), the innermost loop searches every remaining number for the one value that would make 0.",
+      "insight": "Once i and j are fixed, the third number has to be exactly −(nums[i] + nums[j]). Remembering the numbers you've passed in a set finds it in O(1), which removes the third loop.",
+      "code": {
+        "python": "def threeSum(nums):\n    n = len(nums)\n    found = set()\n    for i in range(n):\n        for j in range(i + 1, n):\n            for k in range(j + 1, n):\n                if nums[i] + nums[j] + nums[k] == 0:\n                    found.add(tuple(sorted([nums[i], nums[j], nums[k]])))\n    return sorted(list(t) for t in found)"
+      },
+      "input": {
+        "nums": "[-1, 2, -1, 0, 1]"
+      },
+      "track": {
+        "label": "nums",
+        "items": [
+          "-1",
+          "2",
+          "-1",
+          "0",
+          "1"
+        ]
+      },
+      "pointerStyle": "none",
+      "steps": [
+        {
+          "lines": {
+            "python": [
+              2
+            ]
+          },
+          "note": "n = 5 numbers. The plan: try every group of three positions i < j < k.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "found is a set, so the same values can only be stored once.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{}"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 0: the value -1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 1: the value 2.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 2: the value -1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 2,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + 2 + (-1) = 0. A match!",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 2,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "Sort it to (-1, -1, 2) before storing, so the same values in a different order count as the same triplet.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 2,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 3,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + 2 + 0 = 1. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 3,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 4: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + 2 + 1 = 2. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 2: the value -1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 3,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + (-1) + 0 = -2. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 3,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 4: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + (-1) + 1 = -1. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 4: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + 0 + 1 = 0. A match!",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "Store (-1, 0, 1).",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: there is no position left for k after it.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 1: the value 2.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 2: the value -1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 3,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "2 + (-1) + 0 = 1. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 3,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 4: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "2 + (-1) + 1 = 2. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 4: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "2 + 0 + 1 = 3. Not 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: no position left for k.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 2: the second -1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "k = 4: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "-1 + 0 + 1 = 0 again, this time using the other -1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] + nums[k] == 0",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "It sorts to (-1, 0, 1), which the set already has, so nothing new is stored. That is how the duplicate is avoided.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: no position left for k.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 3: the value 0.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: no position left for k.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 4: nothing comes after it.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "4"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 4,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Return the 2 triplets: [-1, -1, 2] and [-1, 0, 1]. That was 10 groups of three. With n numbers it's about n³/6.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "4"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "k",
+              "value": "4"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": true,
+          "marks": [
+            {
+              "at": 4,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            },
+            {
+              "at": 4,
+              "label": "k"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "authoring": {
+        "setup": "nums = [-1, 2, -1, 0, 1]",
+        "call": "threeSum(nums)",
+        "trackVar": "nums",
+        "leftVar": null,
+        "rightVar": null,
+        "indexVar": null,
+        "sizeVar": null,
+        "hiddenVars": [
+          "nums"
+        ],
+        "skipQuiet": true,
+        "pointerMode": "window",
+        "markVars": [
+          "i",
+          "j",
+          "k"
+        ]
+      }
+    },
+    {
+      "id": "hash-set",
+      "problemId": "15-3sum",
+      "order": 2,
+      "name": "Fix one, two-sum with a set",
+      "kind": "better",
+      "tier": "premium",
+      "time": "O(n²)",
+      "space": "O(n)",
+      "complexityWhy": "Two nested loops over n numbers, each doing an O(1) set lookup: O(n²). The set of seen numbers holds up to n values.",
+      "bottleneck": "It needs a new set for every i, plus a second set to throw away duplicate triplets afterwards.",
+      "insight": "Sort the numbers first. Then, for each fixed i, the other two can be found with two pointers that move toward each other, and equal values sit side by side, so duplicates are easy to skip without any set.",
+      "code": {
+        "python": "def threeSum(nums):\n    found = set()\n    for i in range(len(nums)):\n        seen = set()\n        for j in range(i + 1, len(nums)):\n            need = -nums[i] - nums[j]\n            if need in seen:\n                found.add(tuple(sorted([nums[i], nums[j], need])))\n            seen.add(nums[j])\n    return sorted(list(t) for t in found)"
+      },
+      "input": {
+        "nums": "[-1, 2, -1, 0, 1]"
+      },
+      "track": {
+        "label": "nums",
+        "items": [
+          "-1",
+          "2",
+          "-1",
+          "0",
+          "1"
+        ]
+      },
+      "pointerStyle": "none",
+      "steps": [
+        {
+          "lines": {
+            "python": [
+              2
+            ]
+          },
+          "note": "found collects triplets as sorted tuples, so duplicates collapse into one.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 0: fix the value -1. Now we need two numbers after it that add up to 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "Start an empty set for the numbers we pass in this round.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 1: the value 2.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "The third number would have to be -(-1) - 2 = -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Have we seen -1 in this round? No.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": "hash-map",
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 2.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2}"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 1,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 2: the value -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs -(-1) - (-1) = 2.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Have we seen 2? Yes!",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "Store (-1, -1, 2).",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 3: the value 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen 1? No.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: the value 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen 0? Yes!",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "Store (-1, 0, 1).",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 1, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 1: fix the value 2. The other two must add up to -2.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 1, 2, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "A fresh set for this round.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 2: the value -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs -2 - (-1) = -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen -1? Not in this round.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{-1}"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 2,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 3: the value 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{-1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs -2.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{-1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "-2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen -2? No.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{-1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "-2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{0, -1}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "-2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: the value 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{0, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-2"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs -3.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{0, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen -3? No.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{0, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 1, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 2: fix the second -1. The other two must add up to 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 1, -1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "A fresh set.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 3: the value 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "-3"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen 1? No.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0}"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 3,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: the value 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen 0? Yes.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "(-1, 0, 1) is already stored, so the set ignores it.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 3: fix 0. The other two must add up to 0.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "seen",
+              "value": "{0, 1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "A fresh set.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "j = 4: the value 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "It needs -1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Seen -1? No.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "Remember 1.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "seen",
+              "value": "{1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 3,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 4: nothing comes after it.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "4"
+            },
+            {
+              "name": "seen",
+              "value": "{1}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 4,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "A fresh set, but there is no j to try.",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "4"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 4,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              10
+            ]
+          },
+          "note": "Return [[-1, -1, 2], [-1, 0, 1]]. Two loops instead of three: O(n²).",
+          "vars": [
+            {
+              "name": "found",
+              "value": "{(-1, 0, 1), (-1, -1, 2)}"
+            },
+            {
+              "name": "i",
+              "value": "4"
+            },
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "-1"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": true,
+          "marks": [
+            {
+              "at": 4,
+              "label": "i"
+            },
+            {
+              "at": 4,
+              "label": "j"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "authoring": {
+        "setup": "nums = [-1, 2, -1, 0, 1]",
+        "call": "threeSum(nums)",
+        "trackVar": "nums",
+        "leftVar": null,
+        "rightVar": null,
+        "indexVar": null,
+        "sizeVar": null,
+        "hiddenVars": [
+          "nums"
+        ],
+        "skipQuiet": true,
+        "pointerMode": "window",
+        "markVars": [
+          "i",
+          "j"
+        ]
+      }
+    },
+    {
+      "id": "sort-two-pointers",
+      "problemId": "15-3sum",
+      "order": 3,
+      "name": "Sort, fix one, two pointers",
+      "kind": "optimal",
+      "tier": "premium",
+      "time": "O(n²)",
+      "space": "O(1)",
+      "complexityWhy": "Sorting is O(n log n). Then for each of the n fixed numbers, left and right meet after at most n moves: O(n²) in total. Apart from the answer and the sort, it only keeps a few indexes.",
+      "bottleneck": "",
+      "insight": "This is Two Sum II (#167) run once for every fixed number, with target −nums[i]. O(n²) is the best known for 3Sum in practice.",
+      "code": {
+        "python": "def threeSum(nums):\n    nums.sort()\n    result = []\n    for i in range(len(nums) - 2):\n        if i > 0 and nums[i] == nums[i - 1]:\n            continue\n        left, right = i + 1, len(nums) - 1\n        while left < right:\n            total = nums[i] + nums[left] + nums[right]\n            if total < 0:\n                left += 1\n            elif total > 0:\n                right -= 1\n            else:\n                result.append([nums[i], nums[left], nums[right]])\n                left += 1\n                right -= 1\n                while left < right and nums[left] == nums[left - 1]:\n                    left += 1\n    return result"
+      },
+      "input": {
+        "nums": "[-1, 2, -1, 0, 1]"
+      },
+      "track": {
+        "label": "nums",
+        "items": [
+          "-1",
+          "-1",
+          "0",
+          "1",
+          "2"
+        ]
+      },
+      "pointerStyle": "pair",
+      "pointerNames": [
+        "left",
+        "right"
+      ],
+      "steps": [
+        {
+          "lines": {
+            "python": [
+              2
+            ]
+          },
+          "note": "Sort first: [-1, -1, 0, 1, 2]. Equal values now sit next to each other.",
+          "vars": [],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "result will hold the answer.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 0: fix -1. We need two numbers after it that add up to 1.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "i is the first position, so it can't be a repeat.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "i > 0 and nums[i] == nums[i - 1]",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "left starts right after i (index 1), right at the end (index 4).",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "left is before right: search.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "total = -1 + (-1) + 2 = 0.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              10
+            ]
+          },
+          "note": "0 is not less than 0.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total < 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              12
+            ]
+          },
+          "note": "0 is not more than 0 either, so it's a match.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total > 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              15
+            ]
+          },
+          "note": "Save [-1, -1, 2].",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              16
+            ]
+          },
+          "note": "Move left inward.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": 1,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              17
+            ]
+          },
+          "note": "Move right inward too. With one side fixed, the other has to change for a new sum.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": 4,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              18
+            ]
+          },
+          "note": "Is the new left value (0) the same as the one just used (-1)? No, so nothing to skip.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right and nums[left] == nums[left - 1]",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "left is before right: keep searching.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "total = -1 + 0 + 1 = 0.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              10
+            ]
+          },
+          "note": "Not less than 0.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total < 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              12
+            ]
+          },
+          "note": "Not more than 0: a match.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total > 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              15
+            ]
+          },
+          "note": "Save [-1, 0, 1].",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              16
+            ]
+          },
+          "note": "Move left.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": 2,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              17
+            ]
+          },
+          "note": "Move right. They have crossed.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": 3,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              18
+            ]
+          },
+          "note": "left is past right, so there is nothing to skip.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right and nums[left] == nums[left - 1]",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "The search for i = 0 is done.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 0,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 1: also -1.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "Same value as the one before it. Every triplet it could make was already found, so skip it.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "i > 0 and nums[i] == nums[i - 1]",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": "two-pointers",
+          "done": false,
+          "marks": [
+            {
+              "at": 1,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "i = 2: fix 0. We need two numbers after it that add up to 0.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "Not a repeat: the one before it is -1.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "2"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "i > 0 and nums[i] == nums[i - 1]",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "left = 3, right = 4.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            3,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "left is before right: search.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "0"
+            }
+          ],
+          "window": [
+            3,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "total = 0 + 1 + 2 = 3.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "3"
+            }
+          ],
+          "window": [
+            3,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              10
+            ]
+          },
+          "note": "3 is not less than 0.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "3"
+            }
+          ],
+          "window": [
+            3,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total < 0",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              12
+            ]
+          },
+          "note": "3 is more than 0: too big. Move right inward for a smaller sum.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "3"
+            }
+          ],
+          "window": [
+            3,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total > 0",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": "two-pointers",
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              13
+            ]
+          },
+          "note": "right moves to 3.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "3"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": 4,
+          "check": null,
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "left and right met, so i = 2 is done. That was the last i with two numbers after it.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "3"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        },
+        {
+          "lines": {
+            "python": [
+              20
+            ]
+          },
+          "note": "Return [[-1, -1, 2], [-1, 0, 1]]. Sorting made duplicates easy to skip, so no set was needed.",
+          "vars": [
+            {
+              "name": "result",
+              "value": "[[-1, -1, 2], [-1, 0, 1]]"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "left",
+              "value": "3"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "3"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": true,
+          "marks": [
+            {
+              "at": 2,
+              "label": "i"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "authoring": {
+        "setup": "nums = [-1, 2, -1, 0, 1]",
+        "call": "threeSum(nums)",
+        "trackVar": "nums",
+        "leftVar": "left",
+        "rightVar": "right",
+        "indexVar": null,
+        "sizeVar": null,
+        "hiddenVars": [
+          "nums"
+        ],
+        "skipQuiet": true,
+        "pointerMode": "pair",
+        "markVars": [
+          "i"
+        ]
+      }
+    }
+  ]
+}
