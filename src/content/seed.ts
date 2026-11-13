@@ -445,6 +445,64 @@ export const concepts: Concept[] = [
     ],
   },
   {
+    id: "two-pointers",
+    title: "Two Pointers, explained from zero",
+    summary:
+      "Two indexes walk through the data together, so one pass replaces a nested loop. Most often they start at both ends of a sorted array and move toward each other.",
+    level: "Beginner",
+    readMinutes: 10,
+    published: true,
+    prerequisiteIds: [],
+    relatedIds: ["sliding-window"],
+    practiceProblemIds: ["1-two-sum"],
+    sections: [
+      {
+        heading: "Why it exists",
+        paragraphs: [
+          "Say you want two numbers in [1, 4, 7, 11, 15] that add up to 18. Trying every pair means about n²/2 sums.",
+          "Because the list is sorted, one sum tells you which way to go. 1 + 15 = 16 is too small, and 15 is the largest value, so 1 can never be part of the answer. Drop it and move on. Every sum rules out one value, so the whole search takes at most n steps.",
+        ],
+      },
+      {
+        heading: "The three common shapes",
+        paragraphs: [
+          "Opposite ends: left starts at 0 and right at the last index, and they move toward each other. Used for pair sums, palindromes and container problems. Usually needs sorted data or a symmetric question.",
+          "Same direction, different jobs: a slow pointer marks where the next kept item goes, and a fast pointer scans. Used to remove duplicates or move zeros in place.",
+          "Two inputs: one pointer per array, and you always advance the one with the smaller value. Used to merge sorted lists or find common items.",
+        ],
+      },
+      {
+        heading: "Write the code in 4 steps",
+        paragraphs: [
+          "1. Set up: left = 0 and right = len(nums) - 1 (or both at 0 for same-direction problems).",
+          "2. Loop while left < right.",
+          "3. Look at the two items and decide. If they are the answer, stop.",
+          "4. Move exactly one pointer, the one whose value can't be part of the answer. That move is what makes it O(n).",
+        ],
+        code: `def pair_with_sum(nums, target):     # nums is sorted
+    left, right = 0, len(nums) - 1
+    while left < right:
+        total = nums[left] + nums[right]
+        if total == target:
+            return [left, right]
+        if total < target:
+            left += 1      # too small: the smallest value can't work
+        else:
+            right -= 1     # too big: the largest value can't work
+    return []`,
+      },
+      {
+        heading: "Spot it in a problem",
+        paragraphs: [
+          "The input is sorted, or sorting it doesn't break the question.",
+          "You compare or combine two items: a pair sum, the two ends of a string, two lists.",
+          "The brute force is a nested loop over pairs, and one comparison tells you which pair to skip.",
+          "Watch out: if the problem needs the original positions, sorting loses them. Keep (value, index) pairs, or use a hash map instead.",
+        ],
+      },
+    ],
+  },
+  {
     id: "hash-map",
     title: "Hash maps for counting",
     summary: "A hash map stores key → value pairs and finds any key in about O(1) time. Counting letters or numbers is its most common use in interviews.",
@@ -453,7 +511,7 @@ export const concepts: Concept[] = [
     published: true,
     prerequisiteIds: [],
     relatedIds: ["sliding-window"],
-    practiceProblemIds: ["567-permutation-in-string"],
+    practiceProblemIds: ["1-two-sum", "567-permutation-in-string"],
     sections: [
       {
         heading: "Counting with a map",

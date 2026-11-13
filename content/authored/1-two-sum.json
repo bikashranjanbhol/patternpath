@@ -1,0 +1,2018 @@
+{
+  "problem": {
+    "id": "1-two-sum",
+    "number": 1,
+    "title": "Two Sum",
+    "difficulty": "Easy",
+    "primaryPatternId": "two-pointers",
+    "patternIds": [
+      "two-pointers",
+      "hashing"
+    ],
+    "ladderOrder": 1,
+    "description": "You get a list of integers nums and a number target. Find the two positions whose values add up to target and return those two indexes. There is always exactly one answer, and you can't use the same position twice. Any order of the two indexes is fine.",
+    "examples": [
+      {
+        "input": "nums = [4, 11, 1, 7, 15], target = 18",
+        "output": "[1, 3]",
+        "note": "11 + 7 = 18"
+      },
+      {
+        "input": "nums = [3, 3], target = 6",
+        "output": "[0, 1]",
+        "note": "Equal values at different positions count."
+      }
+    ],
+    "constraints": [
+      "2 ≤ nums.length ≤ 10⁴",
+      "-10⁹ ≤ nums[i], target ≤ 10⁹",
+      "Exactly one pair adds up to target."
+    ],
+    "sourceUrl": "https://leetcode.com/problems/two-sum/",
+    "conceptIds": [
+      "two-pointers",
+      "hash-map"
+    ],
+    "companyTags": [
+      "Amazon",
+      "Google",
+      "Microsoft",
+      "Meta",
+      "Apple"
+    ],
+    "published": true,
+    "solutionSummaries": [
+      {
+        "solutionId": "brute-force",
+        "name": "Check every pair",
+        "kind": "brute",
+        "tier": "free",
+        "time": "O(n²)",
+        "space": "O(1)",
+        "stepCount": 16
+      },
+      {
+        "solutionId": "sort-two-pointers",
+        "name": "Sort, then two pointers",
+        "kind": "better",
+        "tier": "premium",
+        "time": "O(n log n)",
+        "space": "O(n)",
+        "stepCount": 21
+      },
+      {
+        "solutionId": "hash-map",
+        "name": "One pass with a hash map",
+        "kind": "optimal",
+        "tier": "premium",
+        "time": "O(n)",
+        "space": "O(n)",
+        "stepCount": 17
+      }
+    ]
+  },
+  "solutions": [
+    {
+      "id": "brute-force",
+      "problemId": "1-two-sum",
+      "order": 1,
+      "name": "Check every pair",
+      "kind": "brute",
+      "tier": "free",
+      "time": "O(n²)",
+      "space": "O(1)",
+      "complexityWhy": "For each of the n numbers, the inner loop tries every number after it: about n²/2 sums. Nothing extra is stored.",
+      "bottleneck": "Most pairs are checked even though one sum already tells you a lot about the others.",
+      "insight": "If the numbers were sorted, one sum would tell you which way to go: too small, move the left end right; too big, move the right end left.",
+      "code": {
+        "python": "def twoSum(nums, target):\n    n = len(nums)\n    for i in range(n):\n        for j in range(i + 1, n):\n            if nums[i] + nums[j] == target:\n                return [i, j]\n    return []"
+      },
+      "input": {
+        "nums": "[4, 11, 1, 7, 15]",
+        "target": "18"
+      },
+      "track": {
+        "label": "nums",
+        "items": [
+          "4",
+          "11",
+          "1",
+          "7",
+          "15"
+        ]
+      },
+      "pointerStyle": "pair",
+      "pointerNames": [
+        "i",
+        "j"
+      ],
+      "steps": [
+        {
+          "lines": {
+            "python": [
+              2
+            ]
+          },
+          "note": "There are n = 5 numbers. The plan: try every pair (i, j) with i before j, and check its sum.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "Fix the first number of the pair: i = 0, which is 4.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "Pair it with the next number: j = 1, which is 11.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            }
+          ],
+          "window": [
+            0,
+            1
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "4 + 11 = 15. Not 18, keep going.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "1"
+            }
+          ],
+          "window": [
+            0,
+            1
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "Move j to 2: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            }
+          ],
+          "window": [
+            0,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "4 + 1 = 5. Not 18.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            }
+          ],
+          "window": [
+            0,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "Move j to 3: the value 7.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            }
+          ],
+          "window": [
+            0,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "4 + 7 = 11. Not 18.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            }
+          ],
+          "window": [
+            0,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "Move j to 4: the value 15.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "4 + 15 = 19. Not 18. Every pair with 4 has failed, so 4 is not in the answer.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "Move i to 1 (the value 11). Index 0 is done. j will start again right after i.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "4"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": 0,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "j = 2: the value 1.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            }
+          ],
+          "window": [
+            1,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "11 + 1 = 12. Not 18.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "2"
+            }
+          ],
+          "window": [
+            1,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "j = 3: the value 7.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "11 + 7 = 18. Found it!",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "nums[i] + nums[j] == target",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "Return [1, 3]. That took 6 sums here. With n numbers it can take about n²/2 sums.",
+          "vars": [
+            {
+              "name": "n",
+              "value": "5"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "j",
+              "value": "3"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": true
+        }
+      ],
+      "version": 1,
+      "authoring": {
+        "setup": "nums = [4, 11, 1, 7, 15]\ntarget = 18",
+        "call": "twoSum(nums, target)",
+        "trackVar": "nums",
+        "leftVar": "i",
+        "rightVar": "j",
+        "indexVar": null,
+        "sizeVar": null,
+        "hiddenVars": [
+          "nums",
+          "target"
+        ],
+        "skipQuiet": true,
+        "pointerMode": "pair"
+      }
+    },
+    {
+      "id": "sort-two-pointers",
+      "problemId": "1-two-sum",
+      "order": 2,
+      "name": "Sort, then two pointers",
+      "kind": "better",
+      "tier": "premium",
+      "time": "O(n log n)",
+      "space": "O(n)",
+      "complexityWhy": "Sorting takes O(n log n). The pointer walk is O(n): every step moves one pointer inward, so they meet after at most n steps. The sorted copy keeps n (value, index) pairs.",
+      "bottleneck": "Sorting costs O(n log n), and you have to carry each number's original index through the sort.",
+      "insight": "You never needed the order, only the answer to “have I already seen target − x?”. A hash map answers that in O(1).",
+      "code": {
+        "python": "def twoSum(nums, target):\n    pairs = sorted((num, i) for i, num in enumerate(nums))\n    left, right = 0, len(pairs) - 1\n    while left < right:\n        total = pairs[left][0] + pairs[right][0]\n        if total == target:\n            return sorted([pairs[left][1], pairs[right][1]])\n        if total < target:\n            left += 1\n        else:\n            right -= 1\n    return []"
+      },
+      "input": {
+        "nums": "[4, 11, 1, 7, 15]",
+        "target": "18"
+      },
+      "track": {
+        "label": "pairs",
+        "items": [
+          "(1, 2)",
+          "(4, 0)",
+          "(7, 3)",
+          "(11, 1)",
+          "(15, 4)"
+        ]
+      },
+      "pointerStyle": "pair",
+      "pointerNames": [
+        "left",
+        "right"
+      ],
+      "steps": [
+        {
+          "lines": {
+            "python": [
+              2
+            ]
+          },
+          "note": "Pair each number with its original index, then sort by value: (1, 2) (4, 0) (7, 3) (11, 1) (15, 4). Keep the index, because sorting moves the numbers around.",
+          "vars": [],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "Put left on the smallest value (1) and right on the largest (15).",
+          "vars": [
+            {
+              "name": "left",
+              "value": "0"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "left is still before right, so there are pairs left to try.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "0"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "total = 1 + 15 = 16.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "0"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "16"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "16 is not 18.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "0"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "16"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "16 is less than 18: too small. 15 is the biggest value there is, so 1 can't reach 18 with anything. Drop 1.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "0"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "16"
+            }
+          ],
+          "window": [
+            0,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total < target",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": "two-pointers",
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "left moves to 4. The value 1 is ruled out for good.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "16"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": 0,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "left is still before right: keep going.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "16"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "total = 4 + 15 = 19.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "19"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "19 is not 18.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "19"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "19 is not less than 18: too big. Even the smallest value left (4) is too much with 15. Drop 15.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "4"
+            },
+            {
+              "name": "total",
+              "value": "19"
+            }
+          ],
+          "window": [
+            1,
+            4
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total < target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": "two-pointers",
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              11
+            ]
+          },
+          "note": "right moves to 11. The value 15 is ruled out.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "19"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": 4,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "left is still before right: keep going.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "19"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "total = 4 + 11 = 15.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "15"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "15 is not 18.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "15"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total == target",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              8
+            ]
+          },
+          "note": "15 is less than 18: too small. Drop 4.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "1"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "15"
+            }
+          ],
+          "window": [
+            1,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total < target",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              9
+            ]
+          },
+          "note": "left moves to 7.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "15"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": 1,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "left is still before right: keep going.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "15"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "left < right",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "total = 7 + 11 = 18.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "18"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "18 equals 18. Found the pair.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "18"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "total == target",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Read the original indexes from the pairs: 7 was at index 3 and 11 at index 1. Return [1, 3]. Every step ruled out one value, so the walk takes at most n steps.",
+          "vars": [
+            {
+              "name": "left",
+              "value": "2"
+            },
+            {
+              "name": "right",
+              "value": "3"
+            },
+            {
+              "name": "total",
+              "value": "18"
+            }
+          ],
+          "window": [
+            2,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": true
+        }
+      ],
+      "version": 1,
+      "authoring": {
+        "setup": "nums = [4, 11, 1, 7, 15]\ntarget = 18",
+        "call": "twoSum(nums, target)",
+        "trackVar": "pairs",
+        "leftVar": "left",
+        "rightVar": "right",
+        "indexVar": null,
+        "sizeVar": null,
+        "hiddenVars": [
+          "nums",
+          "target",
+          "pairs"
+        ],
+        "skipQuiet": true,
+        "pointerMode": "pair"
+      }
+    },
+    {
+      "id": "hash-map",
+      "problemId": "1-two-sum",
+      "order": 3,
+      "name": "One pass with a hash map",
+      "kind": "optimal",
+      "tier": "premium",
+      "time": "O(n)",
+      "space": "O(n)",
+      "complexityWhy": "One loop over n numbers. Each lookup and insert in the hash map takes O(1) on average. In the worst case the map holds n − 1 numbers.",
+      "bottleneck": "",
+      "insight": "",
+      "code": {
+        "python": "def twoSum(nums, target):\n    seen = {}\n    for i, num in enumerate(nums):\n        need = target - num\n        if need in seen:\n            return [seen[need], i]\n        seen[num] = i\n    return []"
+      },
+      "input": {
+        "nums": "[4, 11, 1, 7, 15]",
+        "target": "18"
+      },
+      "track": {
+        "label": "nums",
+        "items": [
+          "4",
+          "11",
+          "1",
+          "7",
+          "15"
+        ]
+      },
+      "pointerStyle": "i",
+      "steps": [
+        {
+          "lines": {
+            "python": [
+              2
+            ]
+          },
+          "note": "Start an empty map. It will store each number we pass and the index where we saw it.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{}"
+            }
+          ],
+          "window": null,
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 0: the number is 4.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "num",
+              "value": "4"
+            }
+          ],
+          "window": [
+            0,
+            0
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "To reach 18, 4 needs a partner of 18 − 4 = 14.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "num",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "14"
+            }
+          ],
+          "window": [
+            0,
+            0
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "Have we seen 14 already? No.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "num",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "14"
+            }
+          ],
+          "window": [
+            0,
+            0
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": "hash-map",
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Remember 4 at index 0, in case a later number needs it.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0}"
+            },
+            {
+              "name": "i",
+              "value": "0"
+            },
+            {
+              "name": "num",
+              "value": "4"
+            },
+            {
+              "name": "need",
+              "value": "14"
+            }
+          ],
+          "window": [
+            0,
+            0
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 1: the number is 11.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "num",
+              "value": "11"
+            },
+            {
+              "name": "need",
+              "value": "14"
+            }
+          ],
+          "window": [
+            1,
+            1
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "11 needs 18 − 11 = 7.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "num",
+              "value": "11"
+            },
+            {
+              "name": "need",
+              "value": "7"
+            }
+          ],
+          "window": [
+            1,
+            1
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "Have we seen 7? No, only 4 so far.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "num",
+              "value": "11"
+            },
+            {
+              "name": "need",
+              "value": "7"
+            }
+          ],
+          "window": [
+            1,
+            1
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Remember 11 at index 1.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1}"
+            },
+            {
+              "name": "i",
+              "value": "1"
+            },
+            {
+              "name": "num",
+              "value": "11"
+            },
+            {
+              "name": "need",
+              "value": "7"
+            }
+          ],
+          "window": [
+            1,
+            1
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 2: the number is 1.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "num",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "7"
+            }
+          ],
+          "window": [
+            2,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "1 needs 18 − 1 = 17.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "num",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "17"
+            }
+          ],
+          "window": [
+            2,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "Have we seen 17? No.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "num",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "17"
+            }
+          ],
+          "window": [
+            2,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": false
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              7
+            ]
+          },
+          "note": "Remember 1 at index 2.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1, 1:2}"
+            },
+            {
+              "name": "i",
+              "value": "2"
+            },
+            {
+              "name": "num",
+              "value": "1"
+            },
+            {
+              "name": "need",
+              "value": "17"
+            }
+          ],
+          "window": [
+            2,
+            2
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              3
+            ]
+          },
+          "note": "i = 3: the number is 7.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1, 1:2}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "num",
+              "value": "7"
+            },
+            {
+              "name": "need",
+              "value": "17"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              4
+            ]
+          },
+          "note": "7 needs 18 − 7 = 11.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1, 1:2}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "num",
+              "value": "7"
+            },
+            {
+              "name": "need",
+              "value": "11"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              5
+            ]
+          },
+          "note": "Have we seen 11? Yes, at index 1.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1, 1:2}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "num",
+              "value": "7"
+            },
+            {
+              "name": "need",
+              "value": "11"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": {
+            "left": "need in seen",
+            "op": "",
+            "right": "",
+            "result": true
+          },
+          "conceptId": null,
+          "done": false
+        },
+        {
+          "lines": {
+            "python": [
+              6
+            ]
+          },
+          "note": "Return [1, 3]: 11 at index 1 plus 7 at index 3. One pass, no sorting, and one O(1) lookup per number.",
+          "vars": [
+            {
+              "name": "seen",
+              "value": "{4:0, 11:1, 1:2}"
+            },
+            {
+              "name": "i",
+              "value": "3"
+            },
+            {
+              "name": "num",
+              "value": "7"
+            },
+            {
+              "name": "need",
+              "value": "11"
+            }
+          ],
+          "window": [
+            3,
+            3
+          ],
+          "inIndex": null,
+          "outIndex": null,
+          "check": null,
+          "conceptId": null,
+          "done": true
+        }
+      ],
+      "version": 1,
+      "authoring": {
+        "setup": "nums = [4, 11, 1, 7, 15]\ntarget = 18",
+        "call": "twoSum(nums, target)",
+        "trackVar": "nums",
+        "leftVar": null,
+        "rightVar": null,
+        "indexVar": "i",
+        "sizeVar": null,
+        "hiddenVars": [
+          "nums",
+          "target"
+        ],
+        "skipQuiet": true,
+        "pointerMode": "window"
+      }
+    }
+  ]
+}

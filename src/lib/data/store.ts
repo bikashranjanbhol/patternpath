@@ -105,16 +105,4 @@ export async function contentAdmin(): Promise<ContentAdmin> {
 }
 
 /** Solution summaries kept on the problem document (no code, safe to show). */
-export function summarize(solutions: Solution[]): Problem["solutionSummaries"] {
-  return [...solutions]
-    .sort((a, b) => a.order - b.order)
-    .map((s) => ({
-      solutionId: s.id,
-      name: s.name,
-      kind: s.kind,
-      tier: s.tier,
-      time: s.time,
-      space: s.space,
-      stepCount: s.steps.length,
-    }));
-}
+export { summarize } from "@/lib/summarize";

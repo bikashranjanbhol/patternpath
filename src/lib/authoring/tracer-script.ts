@@ -72,7 +72,13 @@ def run_trace(code, setup, call, track_var, max_events):
 
         def close_pending():
             if pending["ev"] is not None:
-                pending["ev"]["locals"] = _snapshot(pending["frame"])
+                frame = pending["frame"]
+                pending["ev"]["locals"] = _snapshot(frame)
+                # The drawn variable can also be made inside the solution
+                # (e.g. a sorted copy): take its first value there.
+                if (result["trackItems"] is None and track_var
+                        and pending["ev"]["depth"] == 1 and track_var in frame.f_locals):
+                    result["trackItems"] = _items(frame.f_locals[track_var])
                 pending["ev"] = None
 
         def local_trace(frame, event, arg):
@@ -94,7 +100,9 @@ def run_trace(code, setup, call, track_var, max_events):
         _stack = []
 
         def global_trace(frame, event, arg):
-            if event == "call" and frame.f_code.co_filename == "<solution>":
+            # Skip helper frames like <genexpr>, <lambda> and <listcomp>.
+            if (event == "call" and frame.f_code.co_filename == "<solution>"
+                    and not frame.f_code.co_name.startswith("<")):
                 _stack.append(frame.f_code.co_name)
                 return local_trace
             return None

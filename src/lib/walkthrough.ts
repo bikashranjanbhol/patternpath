@@ -25,6 +25,7 @@ export interface ApproachView {
   languages: Language[];
   track: Solution["track"];
   pointerStyle: Solution["pointerStyle"];
+  pointerNames?: [string, string];
   stepCount: number;
   /** Empty when locked. */
   steps: Step[];
@@ -63,13 +64,15 @@ export function buildApproachViews(solutions: Solution[], isPremium: boolean): A
         space: s.space,
         complexityWhy: s.complexityWhy,
         bottleneck: s.bottleneck,
-        insight: locked ? null : s.insight,
+        // Locked: null means "there is one, unlock it"; an empty insight stays empty.
+        insight: locked && s.insight ? null : s.insight,
         locked,
         code,
         hiddenLineCount,
         languages,
         track: s.track,
         pointerStyle: s.pointerStyle,
+        pointerNames: s.pointerNames,
         stepCount: s.steps.length,
         steps: locked ? [] : s.steps,
         version: s.version,

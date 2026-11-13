@@ -33,11 +33,25 @@ export const DEFAULT_RECORDING: RecordingConfig = {
   sizeVar: null,
   hiddenVars: [],
   skipQuiet: true,
+  pointerMode: "window",
 };
 
 const CHECK_RE = /^(if|elif|while)\s+(.+?):\s*(.*)$/;
 
 const indent = (s: string) => s.length - s.trimStart().length;
+
+/** Last line (1-based) of the block that starts after `line`, e.g. an if body before its else. */
+function blockEnd(lines: string[], line: number): number {
+  const own = indent(lines[line - 1] ?? "");
+  let end = line;
+  for (let k = line + 1; k <= lines.length; k++) {
+    const text = lines[k - 1];
+    if (text.trim() === "" || text.trim().startsWith("#")) continue;
+    if (indent(text) <= own) break;
+    end = k;
+  }
+  return end;
+}
 const asInt = (v: string | undefined) => (v !== undefined && /^-?\d+$/.test(v) ? Number(v) : null);
 
 /** Names assigned in the setup block (these are inputs, not interesting changes). */
@@ -69,6 +83,30 @@ function windowOf(
   const [a, b] = w;
   if (a > b || a < 0 || (length > 0 && b >= length)) return null;
   return w;
+}
+
+/** Cell that just stopped being a candidate, and cell that just entered. */
+function movement(
+  cfg: RecordingConfig,
+  left: number | null,
+  right: number | null,
+  prevLeft: number | null,
+  prevRight: number | null,
+): { inIndex: number | null; outIndex: number | null } {
+  if (cfg.pointerMode === "pair") {
+    // Two pointers: only a single one-cell move toward the other one rules a cell out.
+    const leftMoved = left !== null && prevLeft !== null && left === prevLeft + 1;
+    const rightMoved = right !== null && prevRight !== null && right === prevRight - 1;
+    const leftSame = left === prevLeft;
+    const rightSame = right === prevRight;
+    if (leftMoved && rightSame) return { inIndex: null, outIndex: prevLeft };
+    if (rightMoved && leftSame) return { inIndex: null, outIndex: prevRight };
+    return { inIndex: null, outIndex: null };
+  }
+  return {
+    inIndex: right !== null && prevRight !== null && right > prevRight ? right : null,
+    outIndex: left !== null && prevLeft !== null && left > prevLeft ? prevLeft : null,
+  };
 }
 
 function draftNote(
@@ -111,29 +149,31 @@ export function deriveSteps(code: string, trace: TraceResult, cfg: RecordingConf
     );
     const changedForNote = changed.filter((v) => !(inputs.has(v.name) && !(v.name in prev)));
 
-    // Condition checks: the branch was taken if the next line is inside the block,
-    // or (for a one-line `if …: return …`) if this line returned.
+    // Condition checks: the branch was taken if the next line is inside its own
+    // block (not a following else/elif), or (for a one-line `if …: return …`)
+    // if this line returned.
     let check: Step["check"] = null;
     const m = text.trim().match(CHECK_RE);
     if (m) {
       const inlineBody = m[3].trim().length > 0;
       const taken = inlineBody
         ? ev.returned !== undefined || (next !== undefined && next.line === ev.line)
-        : next !== undefined &&
-          next.line > ev.line &&
-          indent(lines[next.line - 1] ?? "") > indent(text);
+        : next !== undefined && next.line > ev.line && next.line <= blockEnd(lines, ev.line);
       check = { left: m[2].trim(), op: "", right: "", result: taken };
     }
 
     const window = windowOf(ev.locals, cfg, length);
     const left = cfg.leftVar ? asInt(ev.locals[cfg.leftVar]) : null;
     const right = cfg.rightVar ? asInt(ev.locals[cfg.rightVar]) : null;
-    const inIndex = right !== null && prevRight !== null && right > prevRight ? right : null;
-    const outIndex = left !== null && prevLeft !== null && left > prevLeft ? prevLeft : null;
+    const { inIndex, outIndex } = movement(cfg, left, right, prevLeft, prevRight);
     const windowMoved = JSON.stringify(window) !== JSON.stringify(prevWindowRaw);
 
+    // Hidden variables don't show, but a line that sets one still did something.
+    const anyChanged = Object.keys(ev.locals).some(
+      (n) => prev[n] !== ev.locals[n] && !(inputs.has(n) && !(n in prev)),
+    );
     const quiet =
-      changed.length === 0 && !check && ev.returned === undefined && !windowMoved;
+      changed.length === 0 && !anyChanged && !check && ev.returned === undefined && !windowMoved;
     prev = ev.locals;
     prevWindowRaw = window;
     if (left !== null) prevLeft = left;

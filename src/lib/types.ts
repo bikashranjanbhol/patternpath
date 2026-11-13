@@ -104,6 +104,12 @@ export interface RecordingConfig {
   hiddenVars: string[];
   /** Drop lines that change nothing and test nothing. */
   skipQuiet: boolean;
+  /**
+   * How leftVar/rightVar are drawn: "window" shades every cell between them
+   * (sliding window); "pair" marks only the two cells (two pointers, i/j loops).
+   * Missing means "window".
+   */
+  pointerMode?: "window" | "pair";
 }
 
 export interface Solution {
@@ -123,7 +129,9 @@ export interface Solution {
   /** The sequence drawn as cells in the dry run, e.g. the string s2. */
   track: { label: string; items: string[] };
   /** How pointers are labelled: L/R for windows, i for a start index, none. */
-  pointerStyle: "LR" | "i" | "none";
+  pointerStyle: "LR" | "i" | "pair" | "none";
+  /** Labels under the two pointer cells, e.g. ["i", "j"]. Default L and R. */
+  pointerNames?: [string, string];
   steps: Step[];
   version: number;
   authoring?: RecordingConfig;

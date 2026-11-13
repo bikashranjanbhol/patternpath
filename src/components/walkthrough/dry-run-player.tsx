@@ -211,14 +211,19 @@ function Track({ approach, step }: { approach: ApproachView; step: Step }) {
   const items = approach.track.items;
   const win = step.window;
   const cols = { gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` };
+  // Longer cells (numbers, tuples) get a smaller font so they still fit.
+  const longest = Math.max(0, ...items.map((x) => x.length));
+  const cellFont = longest <= 2 ? "text-lg sm:text-[22px]" : longest <= 4 ? "text-base sm:text-lg" : "text-xs sm:text-sm";
+  const pair = approach.pointerStyle === "pair";
+  const [nameL, nameR] = approach.pointerNames ?? ["L", "R"];
   const pointer = (k: number) => {
     if (!win) return "";
-    if (approach.pointerStyle === "LR") return [k === win[0] ? "L" : "", k === win[1] ? "R" : ""].filter(Boolean).join(" ");
+    if (approach.pointerStyle === "LR" || pair) return [k === win[0] ? nameL : "", k === win[1] ? nameR : ""].filter(Boolean).join(" ");
     if (approach.pointerStyle === "i") return k === win[0] ? "i" : "";
     return k === win[0] ? "match" : "";
   };
   return (
-    <div className="flex flex-col gap-2" aria-label={`${approach.track.label} with the current window highlighted`}>
+    <div className="flex flex-col gap-2" aria-label={`${approach.track.label} with the current ${pair ? "pointers" : "window"} highlighted`}>
       <span className="font-mono text-xs text-dim">{approach.track.label}</span>
       <div className="grid h-4 gap-2.5 text-center font-mono text-[11px] font-semibold" style={cols}>
         {items.map((_, k) => (
@@ -229,14 +234,15 @@ function Track({ approach, step }: { approach: ApproachView; step: Step }) {
       </div>
       <div className="grid gap-2.5" style={cols}>
         {items.map((ch, k) => {
-          const inWin = !!win && k >= win[0] && k <= win[1];
+          // A pair marks only its two cells; a window shades everything between them.
+          const inWin = !!win && (pair ? k === win[0] || k === win[1] : k >= win[0] && k <= win[1]);
           let cls = "border border-line bg-surface-2 text-dim";
           if (step.done && inWin) cls = "border-2 border-lime bg-lime font-semibold text-bg";
           else if (step.inIndex === k) cls = "border-2 border-teal bg-teal/15 text-ink";
           else if (step.outIndex === k) cls = "border-2 border-dashed border-coral bg-coral/10 text-coral";
           else if (inWin) cls = "border-2 border-lime bg-lime/10 text-ink";
           return (
-            <div key={k} className={`flex h-14 items-center justify-center rounded-xl font-mono text-lg sm:text-[22px] ${cls}`}>
+            <div key={k} className={`flex h-14 items-center justify-center rounded-xl font-mono ${cellFont} ${cls}`}>
               {ch}
             </div>
           );

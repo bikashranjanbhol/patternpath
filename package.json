@@ -13,7 +13,8 @@
     "emulators": "firebase emulators:start",
     "predev": "node scripts/copy-pyodide.mjs",
     "prebuild": "node scripts/copy-pyodide.mjs",
-    "make-admin": "tsx scripts/make-admin.ts"
+    "make-admin": "tsx scripts/make-admin.ts",
+    "record": "tsx scripts/record.ts"
   },
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.7",

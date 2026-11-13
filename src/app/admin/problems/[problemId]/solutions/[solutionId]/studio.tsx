@@ -80,8 +80,13 @@ export function Studio({ problem, existing, others, concepts }: Props) {
     return [...names];
   }, [trace, steps]);
 
+  const isPair = cfg.pointerMode === "pair" && !!cfg.leftVar && !!cfg.rightVar;
   const pointerStyle: Solution["pointerStyle"] =
-    cfg.leftVar && cfg.rightVar ? "LR" : cfg.indexVar ? "i" : "none";
+    cfg.leftVar && cfg.rightVar ? (isPair ? "pair" : "LR") : cfg.indexVar ? "i" : "none";
+  const pointerNames = useMemo<[string, string] | undefined>(
+    () => (isPair ? [cfg.leftVar!, cfg.rightVar!] : undefined),
+    [isPair, cfg.leftVar, cfg.rightVar],
+  );
 
   function setMetaField<K extends keyof typeof meta>(k: K, v: (typeof meta)[K]) {
     setMeta((m) => ({ ...m, [k]: v }));
@@ -107,7 +112,8 @@ export function Studio({ problem, existing, others, concepts }: Props) {
       if (!config.leftVar && !config.indexVar) {
         const names = new Set(result.events.flatMap((e) => Object.keys(e.locals)));
         const pair = POINTER_PAIRS.find(([a, b]) => names.has(a) && names.has(b));
-        if (pair) config = { ...config, leftVar: pair[0], rightVar: pair[1] };
+        // i/j loops compare two cells; other names default to a window (change it under "What to draw").
+        if (pair) config = { ...config, leftVar: pair[0], rightVar: pair[1], pointerMode: pair[0] === "i" ? "pair" : config.pointerMode ?? "window" };
       }
       setCfg(config);
       setTrace(result);
@@ -166,6 +172,7 @@ export function Studio({ problem, existing, others, concepts }: Props) {
       ),
       track: { label: cfg.trackVar ?? "", items: trackItems },
       pointerStyle,
+      ...(pointerNames ? { pointerNames } : {}),
       steps,
       version: (existing?.version ?? 0) + 1,
       authoring: cfg,
@@ -189,11 +196,12 @@ export function Studio({ problem, existing, others, concepts }: Props) {
       languages: ["python"],
       track: { label: cfg.trackVar ?? "", items: trackItems },
       pointerStyle,
+      pointerNames,
       stepCount: steps.length,
       steps,
       version: 1,
     }),
-    [id, meta, code, cfg.trackVar, trackItems, pointerStyle, steps],
+    [id, meta, code, cfg.trackVar, trackItems, pointerStyle, pointerNames, steps],
   );
 
   async function save() {
@@ -300,10 +308,10 @@ export function Studio({ problem, existing, others, concepts }: Props) {
           <Field label="Key insight" hint="Leads to the next approach"><textarea rows={2} className={inputCls} value={meta.insight} onChange={(e) => setMetaField("insight", e.target.value)} /></Field>
 
           <h2 className="pt-2 font-display text-lg font-semibold">3 · What to draw</h2>
-          <Field label="Show as cells">
+          <Field label="Show as cells" hint="Record again after changing">
             <select className={inputCls} value={cfg.trackVar ?? ""} onChange={(e) => setCfg({ ...cfg, trackVar: e.target.value || null })}>
               <option value="">Nothing</option>
-              {[...setupNames(cfg.setup)].map((n) => <option key={n}>{n}</option>)}
+              {[...new Set([...setupNames(cfg.setup), ...varNames, ...(cfg.trackVar ? [cfg.trackVar] : [])])].map((n) => <option key={n}>{n}</option>)}
             </select>
           </Field>
           <div className="grid grid-cols-2 gap-3">
@@ -314,6 +322,14 @@ export function Studio({ problem, existing, others, concepts }: Props) {
               <VarSelect names={varNames} value={cfg.rightVar ?? cfg.sizeVar} onChange={(v) => rebuild(cfg.indexVar && !cfg.rightVar ? { ...cfg, sizeVar: v } : { ...cfg, rightVar: v })} />
             </Field>
           </div>
+          {!cfg.indexVar && (
+            <Field label="Draw the two pointers as">
+              <select className={inputCls} value={cfg.pointerMode ?? "window"} onChange={(e) => rebuild({ ...cfg, pointerMode: e.target.value as "window" | "pair" })}>
+                <option value="window">A window: shade every cell between them</option>
+                <option value="pair">Two pointers: mark only their two cells</option>
+              </select>
+            </Field>
+          )}
           <label className="flex items-center gap-2 text-sm text-muted">
             <input
               type="checkbox"
@@ -350,7 +366,7 @@ export function Studio({ problem, existing, others, concepts }: Props) {
             Skip lines that change nothing
           </label>
           {!trace && steps.length > 0 && (
-            <p className="text-xs text-dim">Record again to change what is drawn; saved steps are shown below.</p>
+            <p className="text-xs text-dim">Record again to change what is drawn; saved steps are shown below. A variable made inside the solution is drawn from its first value.</p>
           )}
         </section>
       </div>

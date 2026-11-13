@@ -54,6 +54,7 @@ export const RecordingSchema = z.object({
   sizeVar: z.string().nullable(),
   hiddenVars: z.array(z.string()),
   skipQuiet: z.boolean(),
+  pointerMode: z.enum(["window", "pair"]).optional(),
 });
 
 export const SolutionSchema = z.object({
@@ -71,7 +72,8 @@ export const SolutionSchema = z.object({
   code: z.partialRecord(languages, z.string().max(20000)),
   input: z.record(z.string(), z.string()),
   track: z.object({ label: z.string().max(40), items: z.array(z.string().max(40)).max(60) }),
-  pointerStyle: z.enum(["LR", "i", "none"]),
+  pointerStyle: z.enum(["LR", "i", "pair", "none"]),
+  pointerNames: z.tuple([z.string().min(1).max(12), z.string().min(1).max(12)]).optional(),
   steps: z.array(StepSchema).min(1).max(300),
   version: z.number().int().min(1),
   authoring: RecordingSchema.optional(),

@@ -42,6 +42,19 @@ Where saves go:
 
 **Download JSON** on either screen gives you the same file to share or review.
 
+### Or write a problem as a source file
+
+`content/sources/<problem-id>.ts` holds the problem, each solution's Python code, the example
+to record, what to draw, and one note per step (see `1-two-sum.ts`). Then:
+
+```bash
+npm run record -- 1-two-sum --draft   # print the drafted steps to write notes from
+npm run record -- 1-two-sum           # record and write content/authored/1-two-sum.json
+```
+
+The note count must match the step count, so notes can't silently land on the wrong line
+after the code changes. Needs `python3`.
+
 ## Run against Firebase
 
 1. Create a Firebase project, enable **Authentication → Google**, create a **Firestore** database,
@@ -101,6 +114,7 @@ Vercel's Hobby plan is for non-commercial use; move to Pro (or Firebase App Host
 | `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint |
 | `npm run seed` | Write seed content to Firestore |
+| `npm run record -- <id> [--draft]` | Record a problem from `content/sources/` |
 | `npm run make-admin -- <email>` | Give a Google account the admin role (Firestore mode) |
 
 ## Where things live
@@ -115,6 +129,7 @@ Vercel's Hobby plan is for non-commercial use; move to Pro (or Firebase App Host
 | `src/lib/payments/` | Gateway interface, Cashfree adapter, webhook parsing, fulfilment |
 | `src/app/admin/` | Content authoring: problem editor and solution studio |
 | `src/lib/authoring/` | Python tracer (Pyodide), trace → steps, save schemas |
+| `content/sources/` | Problems written as source files (code, example, notes) |
 | `content/authored/` | Problems saved by the authoring tool in local mode |
 | `src/content/seed.ts` | Seed content: 16 patterns, 2 problems with dry runs, 4 concept articles |
 | `firestore.rules`, `firestore.indexes.json` | From the Database Design doc |
