@@ -37,6 +37,8 @@ export const DEFAULT_RECORDING: RecordingConfig = {
 };
 
 const CHECK_RE = /^(if|elif|while)\s+(.+?):\s*(.*)$/;
+/** `x = …`, `a, b = …`, `x += …`: worth a step even when the value stays the same. */
+const ASSIGN_RE = /^[A-Za-z_][\w.,\s\[\]]*?\s*(?:[-+*/%]|\/\/)?=(?!=)/;
 
 const indent = (s: string) => s.length - s.trimStart().length;
 
@@ -103,6 +105,11 @@ function movement(
     if (rightMoved && leftSame) return { inIndex: null, outIndex: prevRight };
     return { inIndex: null, outIndex: null };
   }
+  // A window that jumped back (a reset, e.g. a new binary search) has no in/out marks.
+  const movedBack =
+    (left !== null && prevLeft !== null && left < prevLeft) ||
+    (right !== null && prevRight !== null && right < prevRight);
+  if (movedBack) return { inIndex: null, outIndex: null };
   return {
     inIndex: right !== null && prevRight !== null && right > prevRight ? right : null,
     outIndex: left !== null && prevLeft !== null && left > prevLeft ? prevLeft : null,
@@ -173,7 +180,12 @@ export function deriveSteps(code: string, trace: TraceResult, cfg: RecordingConf
       (n) => prev[n] !== ev.locals[n] && !(inputs.has(n) && !(n in prev)),
     );
     const quiet =
-      changed.length === 0 && !anyChanged && !check && ev.returned === undefined && !windowMoved;
+      changed.length === 0 &&
+      !anyChanged &&
+      !check &&
+      ev.returned === undefined &&
+      !windowMoved &&
+      !ASSIGN_RE.test(text.trim());
     prev = ev.locals;
     prevWindowRaw = window;
     if (left !== null) prevLeft = left;

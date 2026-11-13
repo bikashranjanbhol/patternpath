@@ -84,8 +84,8 @@ export function Studio({ problem, existing, others, concepts }: Props) {
   const pointerStyle: Solution["pointerStyle"] =
     cfg.leftVar && cfg.rightVar ? (isPair ? "pair" : "LR") : cfg.indexVar ? "i" : "none";
   const pointerNames = useMemo<[string, string] | undefined>(
-    () => (isPair ? [cfg.leftVar!, cfg.rightVar!] : undefined),
-    [isPair, cfg.leftVar, cfg.rightVar],
+    () => (cfg.leftVar && cfg.rightVar ? [cfg.leftVar, cfg.rightVar] : undefined),
+    [cfg.leftVar, cfg.rightVar],
   );
 
   function setMetaField<K extends keyof typeof meta>(k: K, v: (typeof meta)[K]) {

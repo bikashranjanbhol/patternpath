@@ -125,3 +125,31 @@ describe("two pointers and branches", () => {
     expect(steps.some((s) => s.lines.python?.[0] === 4)).toBe(true);
   });
 });
+
+describe("binary search shapes", () => {
+  const code = ["def f(a):", "    lo, hi = 0, 3", "    mid = (lo + hi) // 2", "    lo, hi = 0, 3", "    mid = (lo + hi) // 2"].join("\n");
+  const ev = (line: number, locals: Record<string, string>): TraceEvent => ({ line, depth: 1, locals });
+  const trace: TraceResult = {
+    events: [
+      ev(2, { lo: "2", hi: "2" }),
+      ev(3, { lo: "2", hi: "2", mid: "1" }),
+      ev(4, { lo: "0", hi: "3", mid: "1" }),
+      ev(5, { lo: "0", hi: "3", mid: "1" }),
+    ],
+    trackItems: ["a", "b", "c", "d"],
+    returnValue: "None",
+    error: null,
+    truncated: false,
+    stdout: "",
+  };
+  const steps = deriveSteps(code, trace, { ...DEFAULT_RECORDING, leftVar: "lo", rightVar: "hi" });
+
+  it("keeps an assignment even when the value doesn't change", () => {
+    expect(steps.filter((s) => s.lines.python?.[0] === 5)).toHaveLength(1);
+  });
+
+  it("puts no in/out marks on a window reset", () => {
+    const reset = steps.find((s) => s.lines.python?.[0] === 4)!;
+    expect([reset.inIndex, reset.outIndex]).toEqual([null, null]);
+  });
+});

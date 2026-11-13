@@ -79,6 +79,32 @@ Object.assign(sliding, {
   problemCount: 2,
 } satisfies Partial<Pattern>);
 
+const TWO_POINTERS_TEMPLATE = `def solve(nums, target):        # nums is sorted
+    left, right = 0, len(nums) - 1
+    while left < right:
+        total = nums[left] + nums[right]
+        if total == target:
+            return [left, right]
+        if total < target:
+            left += 1      # too small: drop the smallest value
+        else:
+            right -= 1     # too big: drop the largest value
+    return []`;
+
+const twoPointers = patterns.find((p) => p.id === "two-pointers")!;
+Object.assign(twoPointers, {
+  summary:
+    "Two indexes walk the data together so one pass replaces a nested loop. On sorted data they start at both ends, and every comparison rules out one value.",
+  signals: [
+    "The input is sorted, or sorting it doesn't change the answer",
+    '"pair", "two numbers", or comparing both ends of a string',
+    "In-place work: remove duplicates, move zeros, reverse",
+  ],
+  notSignals: ["You need original positions and the input isn't sorted: a hash map is often simpler"],
+  template: { python: TWO_POINTERS_TEMPLATE },
+  conceptId: "two-pointers",
+} satisfies Partial<Pattern>);
+
 // ---------------------------------------------------------------------------
 // Helpers for writing dry-run steps
 // ---------------------------------------------------------------------------
@@ -454,7 +480,7 @@ export const concepts: Concept[] = [
     published: true,
     prerequisiteIds: [],
     relatedIds: ["sliding-window"],
-    practiceProblemIds: ["1-two-sum"],
+    practiceProblemIds: ["1-two-sum", "167-two-sum-ii-input-array-is-sorted"],
     sections: [
       {
         heading: "Why it exists",
@@ -486,9 +512,9 @@ export const concepts: Concept[] = [
         if total == target:
             return [left, right]
         if total < target:
-            left += 1      # too small: the smallest value can't work
+            left += 1      # too small: drop the smallest value
         else:
-            right -= 1     # too big: the largest value can't work
+            right -= 1     # too big: drop the largest value
     return []`,
       },
       {

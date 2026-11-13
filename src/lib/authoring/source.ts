@@ -86,7 +86,7 @@ export function buildSolution(
     input,
     track: { label: cfg.trackVar ?? "", items: trace.trackItems ?? [] },
     pointerStyle: cfg.leftVar && cfg.rightVar ? (isPair ? "pair" : "LR") : cfg.indexVar ? "i" : "none",
-    ...(isPair ? { pointerNames: [cfg.leftVar!, cfg.rightVar!] as [string, string] } : {}),
+    ...(cfg.leftVar && cfg.rightVar ? { pointerNames: [cfg.leftVar, cfg.rightVar] as [string, string] } : {}),
     steps,
     version: 1,
     authoring: cfg,
