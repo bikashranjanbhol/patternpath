@@ -480,7 +480,7 @@ export const concepts: Concept[] = [
     published: true,
     prerequisiteIds: [],
     relatedIds: ["sliding-window"],
-    practiceProblemIds: ["1-two-sum", "167-two-sum-ii-input-array-is-sorted"],
+    practiceProblemIds: ["1-two-sum", "167-two-sum-ii-input-array-is-sorted", "125-valid-palindrome"],
     sections: [
       {
         heading: "Why it exists",

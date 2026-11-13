@@ -243,7 +243,7 @@ function Track({ approach, step }: { approach: ApproachView; step: Step }) {
           else if (inWin) cls = "border-2 border-lime bg-lime/10 text-ink";
           return (
             <div key={k} className={`flex h-14 items-center justify-center rounded-xl font-mono ${cellFont} ${cls}`}>
-              {ch}
+              {ch === " " ? <span aria-label="space" className="opacity-60">␣</span> : ch}
             </div>
           );
         })}
