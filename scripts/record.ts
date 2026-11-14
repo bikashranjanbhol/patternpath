@@ -56,6 +56,20 @@ async function main() {
   const source = mod.default;
   const problem = ProblemSchema.parse({ ...source.problem, solutionSummaries: [] });
 
+  // Catch typos in pattern and concept IDs before they reach the site.
+  const { patterns, concepts } = await import("../src/content/seed");
+  const knownPatterns = new Set(patterns.map((p) => p.id));
+  const knownConcepts = new Set(concepts.map((c) => c.id));
+  const unknown = [
+    ...[problem.primaryPatternId, ...problem.patternIds].filter((id) => !knownPatterns.has(id)).map((id) => `pattern "${id}"`),
+    ...problem.conceptIds.filter((id) => !knownConcepts.has(id)).map((id) => `concept "${id}"`),
+    ...source.solutions.flatMap((s) => Object.values(s.stepConcepts ?? {})).filter((id) => !knownConcepts.has(id)).map((id) => `step concept "${id}"`),
+  ];
+  if (unknown.length) {
+    console.error(`✗ Unknown ${[...new Set(unknown)].join(", ")}`);
+    process.exit(1);
+  }
+
   const previous: Solution[] = fs.existsSync(outPath(problem.id))
     ? (JSON.parse(fs.readFileSync(outPath(problem.id), "utf8")).solutions as Solution[])
     : [];
